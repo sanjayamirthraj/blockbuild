@@ -150,7 +150,7 @@ export default function Web3BlocksComponent() {
         </div>
         
         <div id="block-canvas" className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] overflow-y-auto">
-          {/* <DotBackgroundDemo /> */}
+          <DotBackgroundDemo />
           <Reorder.Group axis="y" values={placedBlocks} onReorder={setPlacedBlocks} className="flex flex-col gap-2">
             <AnimatePresence>
               {placedBlocks.map((block) => (
