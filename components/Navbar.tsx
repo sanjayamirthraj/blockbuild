@@ -8,7 +8,7 @@ export default function Navbar() {
     const { theme, setTheme } = useTheme();
 
     return (
-        <nav className="w-full bg-[#141313] text-white border-b border-[#555555]">
+        <nav className="fixed w-full bg-[#141313] text-white border-b border-[#555555]">
             <div className="container mx-auto flex items-center justify-between">
                 <div className="flex flex-row space-x-4 ">
                     <div className="flex items-center space-x-4 flex-grow">

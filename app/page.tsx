@@ -5,10 +5,10 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 export default function Home() {
   return (
-    <div className="">
+    <div className="fixed w-full">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <Navbar />
-        <div className="pl-32 w-full -mt-8">
+        <div className="pl-32 w-full pt-20">
           <Web3BlocksComponent />
         </div>
         {/* yo */}
