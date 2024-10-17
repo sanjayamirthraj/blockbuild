@@ -11,6 +11,7 @@ export default function Home() {
         <div className="pl-32 w-full -mt-8">
           <Web3BlocksComponent />
         </div>
+        {/* yo */}
 
         <Sidebar />
       </main>
