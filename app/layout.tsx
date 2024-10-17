@@ -23,6 +23,7 @@ export default function RootLayout({
       <body
         className={`${interTight.variable} font-sans antialiased`}
       >
+        
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
