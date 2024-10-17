@@ -188,7 +188,7 @@ export default function Web3BlocksComponent() {
       </motion.div>
 
       <motion.div
-        className="ml-8 px-8 pt-2 bg-[#1F1F1F]"
+        className="ml-8 px-8 pt-2 bg-[#1F1F1F] border-t-[1px] border-[#555555] z-10"
         animate={{ width: isOpen ? "30rem" : "40rem" }}
         transition={{ duration: 0.3 }}
       >
