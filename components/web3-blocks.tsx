@@ -13,12 +13,12 @@ import {
 
 // Define the block types with Web3/crypto content, colors, and icons
 const blockTypes = [
-  { id: 'start', content: 'Connect Wallet', color: 'bg-[#FF007A]', icon: Wallet },
-  { id: 'swap', content: 'Swap Tokens', color: 'bg-[#FB118E]', icon: ArrowRightLeft },
-  { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#C32DA7]', icon: Repeat },
-  { id: 'governance', content: 'Vote on Proposal', color: 'bg-[#7A1FB7]', icon: MessageSquare },
-  { id: 'stake', content: 'Stake Tokens', color: 'bg-[#9E1FB7]', icon: DollarSign },
-  { id: 'end', content: 'Disconnect', color: 'bg-[#2172E5]', icon: Power },
+  { id: 'start', content: 'Connect Wallet', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', icon: Wallet },
+  { id: 'swap', content: 'Swap Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', icon: ArrowRightLeft },
+  { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', icon: Repeat },
+  { id: 'governance', content: 'Vote on Proposal', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', icon: MessageSquare },
+  { id: 'stake', content: 'Stake Tokens', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', icon: DollarSign },
+  { id: 'end', content: 'Disconnect', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', icon: Power },
 ]
 
 export default function Web3BlocksComponent() {
@@ -54,16 +54,16 @@ export default function Web3BlocksComponent() {
   }
 
   return (
-    <div className="flex h-screen bg-[#F5F6FC] p-8">
+    <div className="flex h-screen bg-[#141313] p-8">
       <div className="w-64 mr-8">
-        <h2 className="text-2xl font-bold mb-4 text-[#0D111C]">DApp Actions</h2>
+        <h2 className="text-2xl font-bold mb-4 text-white">DApp Actions</h2>
         <div className="flex flex-col gap-4">
           {blockTypes.map((block) => (
             <button
               key={block.id}
               onClick={() => addBlock(block)}
               className={`${block.color} text-white p-4 rounded-lg shadow-md cursor-pointer select-none
-                          flex items-center justify-between border-2 border-white hover:border-[#FB118E] transition-colors`}
+                          flex items-center justify-between border-2 ${block.borderColor} hover:border-[#FB118E] transition-colors`}
             >
               <span>{block.content}</span>
               <block.icon className="w-5 h-5" />
@@ -74,14 +74,14 @@ export default function Web3BlocksComponent() {
 
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-[#0D111C]">Transaction Flow</h2>
+          <h2 className="text-2xl font-bold text-white">Transaction Flow</h2>
           {showFinishButton && (
-            <Button onClick={handleFinish} className="bg-[#FF007A] hover:bg-[#FB118E] text-white">
+            <Button onClick={handleFinish} className="bg-[#322131] hover:bg-[#21173E] text-white">
               Execute Flow
             </Button>
           )}
         </div>
-        <div className="flex-1 bg-white rounded-lg shadow-inner p-4 min-h-[200px] overflow-y-auto border-2 border-[#E8ECFB]">
+        <div className="flex-1 bg-[#1F1F1F] rounded-lg shadow-inner p-4 min-h-[200px] overflow-y-auto border-2 border-[#2A2A2A]">
           <Reorder.Group axis="y" values={placedBlocks} onReorder={setPlacedBlocks} className="flex flex-col gap-2">
             {placedBlocks.map((block) => (
               <Reorder.Item key={block.uniqueId} value={block} className="list-none">
@@ -93,7 +93,7 @@ export default function Web3BlocksComponent() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       className={`${block.color} text-white p-4 rounded-lg shadow-md cursor-move select-none
-                                  flex items-center justify-between border-2 border-white hover:border-[#FB118E] transition-colors w-full`}
+                                  flex items-center justify-between border-2 ${block.borderColor} hover:border-[#FB118E] transition-colors w-full`}
                     >
                       <span>{block.content}</span>
                       <block.icon className="w-5 h-5" />
@@ -117,13 +117,13 @@ export default function Web3BlocksComponent() {
       </div>
 
       <div className="w-64 ml-8">
-        <h2 className="text-2xl font-bold mb-4 text-[#0D111C]">Flow Summary</h2>
-        <div className="bg-white rounded-lg shadow-md p-4 border-2 border-[#E8ECFB]">
+        <h2 className="text-2xl font-bold mb-4 text-white">Flow Summary</h2>
+        <div className="bg-[#1F1F1F] rounded-lg shadow-md p-4 border-2 border-[#2A2A2A]">
           {placedBlocks.map((block, index) => (
             <div key={block.uniqueId} className="mb-2 flex items-center">
-              <span className="mr-2 text-[#7A1FB7]">{index + 1}.</span>
-              <block.icon className="w-4 h-4 mr-2 text-[#7A1FB7]" />
-              <span className="text-[#0D111C]">{block.content}</span>
+              <span className="mr-2 text-[#FB118E]">{index + 1}.</span>
+              <block.icon className="w-4 h-4 mr-2 text-[#FB118E]" />
+              <span className="text-white">{block.content}</span>
             </div>
           ))}
         </div>
