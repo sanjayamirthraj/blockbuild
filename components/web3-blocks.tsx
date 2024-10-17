@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/context-menu"
 import { DotBackgroundDemo } from "@/components/dot-background"
 import { toast } from 'sonner'
+import { Info } from 'lucide-react'
 
 // Define the block types with Web3/crypto content, colors, and icons
 const blockTypes = [
@@ -104,6 +105,12 @@ export default function Web3BlocksComponent() {
         >
           {isOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </Button>
+        <div className="absolute right-4 top-4 w-10 h-10 flex items-center justify-center cursor-pointer group">
+          <Info className="size-8 text-white/60 group-hover:shadow-lg transition-shadow duration-300" />
+          <div className="absolute hidden group-hover:block bg-gray-800 text-white/60 text-xs rounded-md p-2 -top-10 right-0">
+            Information about the blocks
+          </div>
+        </div>
         <motion.div
           initial={false}
           animate={{ width: isOpen ? "18.4rem" : "0rem" }}
@@ -201,7 +208,7 @@ export default function Web3BlocksComponent() {
       </motion.div>
 
       <motion.div
-        className="ml-8 px-8 pt-2 bg-[#141313] border-t-[1px] border-l-[1px] border-[#555555] z-10"
+        className="ml-8 px-8 pt-2 bg-[#141313] border-t-[1px] border-l-[1px] border-[#555555] z-10 relative right-0 h-screen"
         animate={{ width: isOpen ? "30rem" : "40rem" }}
         transition={{ duration: 0.3 }}
       >
