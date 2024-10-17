@@ -22,6 +22,12 @@ export default function Home() {
           body: JSON.stringify({ message: 'Hello, world!', name: 'test' }),
         });
       }}>Send to RAG</button>
+      <button style={{ color: 'white' }} onClick={() => {
+        fetch('/deploy-contract', {
+          method: 'POST',
+          body: JSON.stringify({ message: 'Hello, world!', name: 'test' }),
+        });
+      }}>Deploy Contract</button>
     </div>
   );
 }
