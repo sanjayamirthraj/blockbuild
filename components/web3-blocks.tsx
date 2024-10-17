@@ -100,11 +100,11 @@ export default function Web3BlocksComponent() {
         </Button>
         <motion.div
           initial={false}
-          animate={{ width: isOpen ? "20rem" : "0rem" }}
+          animate={{ width: isOpen ? "18.4rem" : "0rem" }}
           transition={{ duration: 0.3 }}
-          className="bg-[#141313] border-r border-[#2A2A2A] overflow-hidden h-full"
+          className="bg-[#141313] border-r border-[#555555] overflow-hidden h-full"
         >
-          <div className="p-6 w-80 pt-12 selectable-none cursor-default">
+          <div className="p-6 w-72 pt-12 selectable-none cursor-default">
             <h2 className="text-2xl font mt-4 mb-4 text-white">DeFi Blocks</h2>
             <div className="flex flex-col gap-6">
               {Object.entries(groupedBlocks).map(([category, blocks]) => (
@@ -188,7 +188,7 @@ export default function Web3BlocksComponent() {
       </motion.div>
 
       <motion.div
-        className="ml-8 px-8 pt-2 bg-[#1F1F1F] border-t-[1px] border-[#555555] z-10"
+        className="ml-8 px-8 pt-2 bg-[#141313] border-t-[1px] border-l-[1px] border-[#555555] z-10"
         animate={{ width: isOpen ? "30rem" : "40rem" }}
         transition={{ duration: 0.3 }}
       >
