@@ -2,7 +2,7 @@ import { ul } from 'framer-motion/client';
 import React from 'react';
 
 const sidebarItems = [
-  { title: 'Most Popular', subtitle: 'DeFi' },
+  { title: 'DeFi', subtitle: 'Most Popular' },
   { title: 'Derivatives' },
   { title: 'Prediction' },
   { title: 'Rebalancing' },
