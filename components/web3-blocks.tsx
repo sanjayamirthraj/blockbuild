@@ -2,8 +2,14 @@
 
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
-import { Wallet, ArrowRightLeft, Repeat, MessageSquare, DollarSign, Power } from 'lucide-react'
+import { Wallet, ArrowRightLeft, Repeat, MessageSquare, DollarSign, Power, Trash2, Pen } from 'lucide-react'
 import { motion, Reorder } from "framer-motion"
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
 
 // Define the block types with Web3/crypto content, colors, and icons
 const blockTypes = [
@@ -15,7 +21,7 @@ const blockTypes = [
   { id: 'end', content: 'Disconnect', color: 'bg-[#2172E5]', icon: Power },
 ]
 
-export function Web3BlocksComponent() {
+export default function Web3BlocksComponent() {
   const [placedBlocks, setPlacedBlocks] = useState([])
   const [showFinishButton, setShowFinishButton] = useState(false)
 
@@ -36,6 +42,15 @@ export function Web3BlocksComponent() {
   const handleFinish = () => {
     console.log("Finished! Transaction flow:", placedBlocks)
     // Add your logic here for what should happen when the Finish button is clicked
+  }
+
+  const handleDelete = (uniqueId) => {
+    removeBlock(uniqueId)
+  }
+
+  const handleCustomize = (uniqueId) => {
+    // Add your customize logic here
+    console.log("Customize block:", uniqueId)
   }
 
   return (
@@ -70,18 +85,31 @@ export function Web3BlocksComponent() {
           <Reorder.Group axis="y" values={placedBlocks} onReorder={setPlacedBlocks} className="flex flex-col gap-2">
             {placedBlocks.map((block) => (
               <Reorder.Item key={block.uniqueId} value={block} className="list-none">
-                <motion.button
-                  layout
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => removeBlock(block.uniqueId)}
-                  className={`${block.color} text-white p-4 rounded-lg shadow-md cursor-move select-none
-                              flex items-center justify-between border-2 border-white hover:border-[#FB118E] transition-colors w-full`}
-                >
-                  <span>{block.content}</span>
-                  <block.icon className="w-5 h-5" />
-                </motion.button>
+                <ContextMenu>
+                  <ContextMenuTrigger>
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className={`${block.color} text-white p-4 rounded-lg shadow-md cursor-move select-none
+                                  flex items-center justify-between border-2 border-white hover:border-[#FB118E] transition-colors w-full`}
+                    >
+                      <span>{block.content}</span>
+                      <block.icon className="w-5 h-5" />
+                    </motion.div>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem onClick={() => handleCustomize(block.uniqueId)}>
+                      <Pen className="mr-2 h-4 w-4" />
+                      <span>Customize</span>
+                    </ContextMenuItem>
+                    <ContextMenuItem onClick={() => handleDelete(block.uniqueId)} className="text-red-600">
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      <span>Delete</span>
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               </Reorder.Item>
             ))}
           </Reorder.Group>
