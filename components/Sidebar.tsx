@@ -11,7 +11,7 @@ const sidebarItems = [
 
 const Sidebar: React.FC = () => {
   return (
-    <div className="w-32 bg-[#141313] text-white h-screen fixed left-0 top-20 -mt-3 border-r-[1px] border-[#555555]">
+    <div className="w-32 bg-[#141313] text-white h-screen fixed left-0 top-20 -mt-4 border-r-[1px] border-t-[1px] border-[#555555]">
       <nav className="h-4">
         <ul>
           {sidebarItems.map((item, index) => (
