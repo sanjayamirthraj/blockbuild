@@ -23,9 +23,15 @@ export default function Home() {
         });
       }}>Send to RAG</button>
       <button style={{ color: 'white' }} onClick={() => {
+        fetch('/compile-contract', {
+          method: 'POST',
+          body: JSON.stringify({ contractName: 'SecureEfficientSwap' }),
+        });
+      }}>Deploy Contract</button>
+      <button style={{ color: 'white' }} onClick={() => {
         fetch('/deploy-contract', {
           method: 'POST',
-          body: JSON.stringify({ message: 'Hello, world!', name: 'test' }),
+          body: JSON.stringify({ contractName: 'SecureEfficientSwap', contractABI: 'SecureEfficientSwapABI', contractBytecode: 'SecureEfficientSwapBytecode' }),
         });
       }}>Deploy Contract</button>
     </div>
