@@ -11,6 +11,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 import { DotBackgroundDemo } from "@/components/dot-background"
+import { toast } from 'sonner'
 
 // Define the block types with Web3/crypto content, colors, and icons
 const blockTypes = [
@@ -56,6 +57,11 @@ export default function Web3BlocksComponent() {
   const handleFinish = () => {
     console.log("Finished! Transaction flow:", placedBlocks)
     // Add your logic here for what should happen when the Finish button is clicked
+  }
+
+  const handleClear = () => {
+    setPlacedBlocks([])
+    toast.success('Blocks cleared')
   }
 
   const handleDelete = (uniqueId) => {
@@ -143,9 +149,16 @@ export default function Web3BlocksComponent() {
         <div className="flex justify-between items-center mt-4 mb-4">
           <h2 className="text-2xl text-white ml-8 mt-1">Project Name</h2>
           {showFinishButton && (
-            <Button onClick={handleFinish} className="bg-[#322131] hover:bg-[#21173E] text-white">
-              Execute Flow
-            </Button>
+
+
+            <div className="flex gap-2">
+              <Button onClick={handleClear} className=" px-6 hover:bg-[#323232] text-white">
+                Clear
+              </Button>
+              <Button onClick={handleFinish} className="bg-[#322131] hover:bg-[#21173E] text-white">
+                Compile
+              </Button>
+            </div>
           )}
         </div>
         
