@@ -8,11 +8,9 @@ export default function Home() {
     <div className="fixed w-full">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <Navbar />
-        <div className="pl-32 w-full pt-20">
+        <div className="pl-32 w-full pt-14">
           <Web3BlocksComponent />
         </div>
-        {/* yo */}
-
         <Sidebar />
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
