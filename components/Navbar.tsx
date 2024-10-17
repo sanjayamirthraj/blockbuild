@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Settings, FolderKanban, FileText, GraduationCap, Bug } from "lucide-react";
@@ -6,9 +6,14 @@ import Link from "next/link";
 
 export default function Navbar() {
     const { theme, setTheme } = useTheme();
+    const [isActive, setIsActive] = useState(false);
+
+    useEffect(() => {
+        // Any client-side logic that might affect class names
+    }, []);
 
     return (
-        <nav className="w-full bg-[#141313] text-white border-b border-[#555555]">
+        <nav className={`w-full bg-[#141313] text-white border-b border-[#555555] ${isActive ? 'active' : ''}`}>
             <div className="container mx-auto flex items-center justify-between">
                 <div className="flex flex-row space-x-4 ">
                     <div className="flex items-center space-x-4 flex-grow">
