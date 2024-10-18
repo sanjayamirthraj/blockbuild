@@ -2,7 +2,8 @@ import { NextResponse, NextRequest } from "next/server";
 const { Web3 } = require("web3");
 
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, res: NextResponse) {
+    const { contractName, contractABI, contractBytecode, deploymentNetwork, signerPrivateKey, arguments } = await req.json();
     const contractNameTest = "SecureEfficientSwap";
     const contractABITest = [
         {
