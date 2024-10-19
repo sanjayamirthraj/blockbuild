@@ -28,6 +28,7 @@ import {
     Info,
     Code,
     Landmark,
+    Droplets,
 } from 'lucide-react'
 import ReactFlow, {
     Background,
@@ -58,7 +59,7 @@ const blockTypes = [
     // Each block represents an action in the DeFi flow
     { id: 'start', content: 'Connect Wallet', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
     { id: 'swap', content: 'Swap Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: ArrowRightLeft },
-    { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: DollarSign },
+    { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: Droplets },
     { id: 'governance', content: 'Vote on Proposal', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: MessageSquare },
     { id: 'stake', content: 'Stake Tokens', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', hoverBorderColor: 'hover:border-[#FB6A9E]', icon: Landmark },
     { id: 'allocate', content: 'Allocate Tokens', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: DollarSign },
@@ -84,10 +85,10 @@ const BlockNode = ({ data, isDragging, id }) => {
     const [selectedNode, setSelectedNode] = useState(null);
     const isSelected = id === selectedNode;
     if (data.id === 'swap') {
-        return <SwapNode data={data} isConnectable={true} />;
+        return <SwapNode data={data} isConnectable={true} id={''} selected={false} type={''} zIndex={0} xPos={0} yPos={0} dragging={false} />;
     }
     if (data.id === 'stake') {
-        return <StakeNode data={data} isConnectable={true} />;
+        return <StakeNode data={data} isConnectable={true} type={''} id={''} selected={false} zIndex={0} xPos={0} yPos={0} dragging={false} />;
     }
     return (
         <div

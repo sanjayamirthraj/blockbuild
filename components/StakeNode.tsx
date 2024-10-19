@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Landmark, Plus, Minus } from 'lucide-react'
+import { Landmark, Plus, SquareMinus } from 'lucide-react'
 
 const tokens = ['ETH', 'USDT', 'BTC', 'DAI', 'LINK']
 
@@ -62,9 +62,9 @@ const StakeNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
                                 className="bg-[#3f2c48] border-[1px] border-[#663B6A]"
                             />
                             {index > 0 && (
-                                <Minus 
+                                <SquareMinus 
                                     onClick={() => removeTokenInput(index)} 
-                                    className="w-4 h-4 cursor-pointer hover:text-[#FB6A9E]" 
+                                    className="w-8 h-8 cursor-pointer hover:text-[#FB6A9E]" 
                                 />
                             )}
                         </div>
