@@ -1,37 +1,14 @@
 "use client"
 
 // React and Next.js imports
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 
 // UI components and utilities
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
-import {
-  Credenza,
-  CredenzaBody,
-  CredenzaClose,
-  CredenzaContent,
-  CredenzaDescription,
-  CredenzaHeader,
-  CredenzaTitle,
-} from "@/components/credeza"
+
 
 // Third-party libraries
 import { useForm } from "react-hook-form"
@@ -50,7 +27,8 @@ import {
   Plus,
   Info,
   Code,
-  Trash2,
+  Landmark,
+  Droplets,
 } from 'lucide-react'
 import ReactFlow, {
   Background,
@@ -63,20 +41,32 @@ import ReactFlow, {
   useStore,
   NodeToolbar,
   Position,
+  reconnectEdge,
+  getOutgoers,
+  useReactFlow,
+  ReactFlowProvider,
+  BaseEdge,
+  NodeProps,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
+import CustomBlockModal from './CustomBlockModal'
+import SwapNode from './SwapNode'
+import StakeNode from './StakeNode'
+import LiquidityNode from './LiquidityNode'
 
 // Define the different block types with their properties
 const blockTypes = [
   // Each block represents an action in the DeFi flow
   { id: 'start', content: 'Connect Wallet', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
   { id: 'swap', content: 'Swap Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: ArrowRightLeft },
-  { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: Repeat },
+  { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: Droplets },
   { id: 'governance', content: 'Vote on Proposal', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: MessageSquare },
-  { id: 'stake', content: 'Stake Tokens', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', hoverBorderColor: 'hover:border-[#FB6A9E]', icon: DollarSign },
+  { id: 'stake', content: 'Stake Tokens', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', hoverBorderColor: 'hover:border-[#FB6A9E]', icon: Landmark },
   { id: 'allocate', content: 'Allocate Tokens', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: DollarSign },
-  { id: 'end', content: 'Disconnect', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
+  { id: 'events', content: 'sdfsdf', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
+  { id: 'when', content: 'ffff', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
+  { id: 'if', content: 'eee', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
 ]
 
 // Group blocks into categories for the sidebar
@@ -85,6 +75,7 @@ const groupedBlocks = {
   "Token Actions": blockTypes.filter(block => ['swap', 'stake', 'allocate'].includes(block.id)),
   "Liquidity": blockTypes.filter(block => block.id === 'liquidity'),
   "Governance": blockTypes.filter(block => block.id === 'governance'),
+  "Events": blockTypes.filter(block => block.id === 'events, when, if'),
 }
 
 // Form validation schema using Zod
@@ -93,8 +84,43 @@ const formSchema = z.object({
   solidityCode: z.string().min(1, "Solidity code is required"),
 })
 
+// Define BlockNode component outside of Web3BlocksComponent
+const BlockNode = ({ data, isDragging, id }) => {
+  const [selectedNode, setSelectedNode] = useState(null);
+  const isSelected = id === selectedNode;
+  if (data.id === 'swap') {
+    return <SwapNode data={data} isConnectable={true} id={''} selected={false} type={''} zIndex={0} xPos={0} yPos={0} dragging={false} />;
+  }
+  if (data.id === 'stake') {
+    return <StakeNode data={data} isConnectable={true} type={''} id={''} selected={false} zIndex={0} xPos={0} yPos={0} dragging={false} />;
+  }
+  if (data.id === 'liquidity') {
+    return <LiquidityNode data={data} isConnectable={true} id={''} selected={false} type={''} zIndex={0} xPos={0} yPos={0} dragging={false} />;
+  }
+  return (
+    <div
+      className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
+                flex items-center justify-between border-[1px] transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''}
+                ${isSelected ? 'border-white shadow-glow' : data.borderColor} ${isSelected ? '' : data.hoverBorderColor} relative`}
+    >
+      {id !== 'start' && <Handle type="target" position={Position.Top} style={{ background: '#555' }} />}
+      <span>{data.content}</span>
+      <data.icon className="w-4 h-4" />
+      <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
+    </div>
+  );
+};
+
+// Define nodeTypes outside of the component
+const nodeTypes = {
+  blockNode: BlockNode,
+  swapNode: SwapNode,
+  stakeNode: StakeNode,
+  liquidityNode: LiquidityNode,
+}
+
 // Main component for the DeFi Blocks builder
-export default function Web3BlocksComponent() {
+function Web3BlocksComponent() {
   // State variables
   const [showFinishButton, setShowFinishButton] = useState(false)
   const [isOpen, setIsOpen] = useState(true)
@@ -104,6 +130,9 @@ export default function Web3BlocksComponent() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [flowSummary, setFlowSummary] = useState([])
   const router = useRouter()
+  const [showClearButton, setShowClearButton] = useState(false)
+  const edgeReconnectSuccessful = useRef(true)
+  const [selectedNode, setSelectedNode] = useState(null)
 
   // Initialize the form
   const form = useForm({
@@ -119,6 +148,7 @@ export default function Web3BlocksComponent() {
     setNodes((nds) => nds.filter((node) => node.id !== nodeId))
     setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId))
     setFlowSummary((prevSummary) => prevSummary.filter((item) => item.id !== nodeId))
+    toast.success('Block deleted')
   }
 
   // Function to add a new node connected to a source node
@@ -135,7 +165,6 @@ export default function Web3BlocksComponent() {
         uniqueId: newNodeId,
         handleDeleteNode,
         handleAddNode,
-      
       },
     }
     setNodes((nds) => [...nds, newNode])
@@ -144,6 +173,7 @@ export default function Web3BlocksComponent() {
     setEdges((eds) => [...eds, newEdge])
 
     updateFlowSummary(sourceNodeId, newNodeId)
+    toast.success(`${block.content} block added`)
   }
 
   // Function to add a block to the canvas
@@ -151,7 +181,9 @@ export default function Web3BlocksComponent() {
     const newNodeId = Date.now().toString()
     const newNode = {
       id: newNodeId,
-      type: 'blockNode',
+      type: block.id === 'stake' ? 'stakeNode' : 
+            block.id === 'swap' ? 'swapNode' :
+            block.id === 'liquidity' ? 'liquidityNode' : 'blockNode',
       position: { x: 100, y: 100 + nodes.length * 100 },
       data: {
         ...block,
@@ -162,6 +194,7 @@ export default function Web3BlocksComponent() {
       },
     }
     setNodes((nds) => [...nds, newNode])
+    toast.success(`${block.content} block added`)
   }
 
   // Effect to check if 'start' and 'end' nodes are present
@@ -169,6 +202,7 @@ export default function Web3BlocksComponent() {
     const hasStart = nodes.some(node => node.data.id === 'start')
     const hasEnd = nodes.some(node => node.data.id === 'end')
     setShowFinishButton(hasStart && hasEnd)
+    setShowClearButton(nodes.length > 0)
   }, [nodes])
 
   // Function to handle the 'Finish' button click
@@ -209,15 +243,9 @@ export default function Web3BlocksComponent() {
   }
 
   // Function to handle node click (currently logs the node ID)
-  const handleNodeClick = (nodeId) => {
-    console.log("Node clicked:", nodeId)
-  }
-
-  // Function to handle connecting two nodes
-  const handleConnect = (params) => {
-    setEdges((eds) => addEdge({ ...params, type: 'step' }, eds))
-    updateFlowSummary(params.source, params.target)
-  }
+  const handleNodeClick = useCallback((event, node) => {
+    setSelectedNode(node.id)
+  }, [])
 
   // Function to update the flow summary based on the connected nodes
   const updateFlowSummary = (sourceId, targetId) => {
@@ -250,68 +278,86 @@ export default function Web3BlocksComponent() {
     })
   }
 
-  // Custom node component for React Flow
-  const BlockNode = ({ data, isDragging, id }) => {
-    const edges = useStore((state) => state.edges)
-    const hasOutgoingEdges = edges.some(edge => edge.source === id)
+  const { getNodes, getEdges } = useReactFlow();
 
-    return (
-      <>
-        {/* Toolbar with delete and add actions */}
-        <NodeToolbar
-          position={hasOutgoingEdges ? Position.Bottom : Position.Right}
-        >
-          <div className="flex space-x-2">
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => data.handleDeleteNode(id)}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+  const isValidConnection = useCallback(
+    (connection) => {
+      const nodes = getNodes();
+      const edges = getEdges();
+      const target = nodes.find((node) => node.id === connection.target);
+      const hasCycle = (node, visited = new Set()) => {
+        if (visited.has(node.id)) return false;
 
-            {!hasOutgoingEdges && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {blockTypes.map((block) => (
-                    <DropdownMenuItem
-                      key={block.id}
-                      onSelect={() => data.handleAddNode(id, block)}
-                    >
-                      {block.content}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </NodeToolbar>
+        visited.add(node.id);
 
-        {/* Block node representation */}
-        <div
-          className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
-                      flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''
-            } relative`}
-         
-        >
-          <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
-          <span>{data.content}</span>
-          <data.icon className="w-4 h-4" />
-          <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
-        </div>
-      </>
-    )
+        for (const outgoer of getOutgoers(node, nodes, edges)) {
+          if (outgoer.id === connection.source) return true;
+          if (hasCycle(outgoer, visited)) return true;
+        }
+      };
+
+      if (target.id === connection.source) return false;
+      return !hasCycle(target);
+    },
+    [getNodes, getEdges]
+  );
+
+  const onConnect = useCallback(
+    (params) => {
+      if (isValidConnection(params)) {
+        setEdges((els) => addEdge(params, els));
+        updateFlowSummary(params.source, params.target);
+      } else {
+        toast.error('Invalid connection: This would create a cycle');
+      }
+    },
+    [isValidConnection, updateFlowSummary]
+  );
+
+  const onReconnectStart = useCallback(() => {
+    edgeReconnectSuccessful.current = false;
+  }, []);
+
+  const onReconnect = useCallback((oldEdge, newConnection) => {
+    edgeReconnectSuccessful.current = true;
+    setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+    updateFlowSummary(newConnection.source, newConnection.target);
+  }, [updateFlowSummary]);
+
+  const onReconnectEnd = useCallback((_, edge) => {
+    if (!edgeReconnectSuccessful.current) {
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+      // Remove the connection from the flow summary
+      setFlowSummary((prevSummary) => {
+        const sourceIndex = prevSummary.findIndex(item => item.id === edge.source);
+        const targetIndex = prevSummary.findIndex(item => item.id === edge.target);
+        if (sourceIndex !== -1 && targetIndex !== -1) {
+          return prevSummary.slice(0, targetIndex);
+        }
+        return prevSummary;
+      });
+    }
+
+    edgeReconnectSuccessful.current = true;
+  }, []);
+
+  // Custom edge styles
+  const edgeStyles = {
+    default: {
+      stroke: '#555',
+      strokeWidth: 2,
+      transition: 'stroke 0.3s, stroke-width 0.3s',
+    },
+    selected: {
+      stroke: '#FE007A',
+      strokeWidth: 3,
+    },
   }
 
-  // Define custom node types for React Flow
-  const nodeTypes = {
-    blockNode: BlockNode,
-  }
+  // Edge update function
+  const edgeUpdateHandler = useCallback((oldEdge, newConnection) => {
+    return { ...oldEdge, ...newConnection }
+  }, [])
 
   return (
     <div className="flex h-screen bg-[#141313] pt-8 selectable-none">
@@ -347,7 +393,7 @@ export default function Web3BlocksComponent() {
             <div className="flex flex-col gap-6">
               {Object.entries(groupedBlocks).map(([category, blocks]) => (
                 <div key={category}>
-                  <h3 className="text-xs mb-2 text-white/80" style={{ color: blocks[0].color.replace('bg-', '') }}>
+                  <h3 className="text-xs mb-2 text-white/80" style={{ color: blocks.length > 0 ? blocks[0].color.replace('bg-', '') : 'white' }}>
                     {category}
                   </h3>
                   <div className="flex flex-col gap-2">
@@ -400,11 +446,13 @@ export default function Web3BlocksComponent() {
               <Label htmlFor="tutorial-mode" className="text-white">Toggle Hover</Label>
             </div>
           </div>
-          {showFinishButton && (
-            <div className="flex gap-2">
-              <Button onClick={handleClear} className="px-6 hover:bg-[#323232] text-white">
+          <div className="flex gap-2">
+            {showClearButton && (
+              <Button onClick={handleClear} className="px-6 bg-[#252525] hover:bg-[#323232] text-white">
                 Clear
               </Button>
+            )}
+            {showFinishButton && (
               <Button
                 onClick={() => {
                   const encodedNodes = encodeURIComponent(JSON.stringify(nodes));
@@ -416,8 +464,8 @@ export default function Web3BlocksComponent() {
               >
                 Compile
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Canvas */}
@@ -427,15 +475,46 @@ export default function Web3BlocksComponent() {
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
-            onConnect={handleConnect}
+            onConnect={onConnect}
+            onReconnect={onReconnect}
+            onReconnectStart={onReconnectStart}
+            onReconnectEnd={onReconnectEnd}
             nodeTypes={nodeTypes}
             defaultEdgeOptions={{ type: 'step' }}
             snapToGrid={true}
             snapGrid={[15, 15]}
+            isValidConnection={isValidConnection}
+            onNodeClick={handleNodeClick}
+            edgeUpdaterRadius={10}
+            onEdgeUpdate={edgeUpdateHandler}
           >
             <Background />
             <Controls />
-            <MiniMap />
+            <MiniMap
+              className='bg-black rounded-lg'
+              nodeColor={(node) => '#FE007A'}
+              nodeStrokeColor="transparent"
+              nodeStrokeWidth={3}
+              maskColor="rgba(28, 26, 26, 0.8)"
+              maskStrokeColor="white"
+              position="bottom-right"
+              ariaLabel="React Flow mini map"
+              pannable
+              zoomable
+            />
+            {edges.map((edge) => (
+              <BaseEdge
+                key={edge.id}
+                id={edge.id}
+                source={edge.source}
+                target={edge.target}
+                style={
+                  selectedNode && (edge.source === selectedNode || edge.target === selectedNode)
+                    ? edgeStyles.selected
+                    : edgeStyles.default
+                }
+              />
+            ))}
           </ReactFlow>
         </div>
       </motion.div>
@@ -458,63 +537,20 @@ export default function Web3BlocksComponent() {
       </motion.div>
 
       {/* Modal for adding custom blocks */}
-      <Credenza open={isCredenzaOpen} onOpenChange={setIsCredenzaOpen}>
-        <CredenzaContent className="border-white/10">
-          <CredenzaHeader>
-            <CredenzaTitle className="text-white">Add a Custom Block</CredenzaTitle>
-            <CredenzaDescription className="text-white/80">
-              Enter your Solidity code below to create a custom block.
-            </CredenzaDescription>
-          </CredenzaHeader>
-          <CredenzaBody>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="blockName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Block Name</FormLabel>
-                      <FormControl>
-                        <input
-                          {...field}
-                          className="w-full p-2 rounded bg-[#1F1F1F] text-white border border-[#2A2A2A] focus:border-[#4A4A4A]"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="solidityCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Solidity Code</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          placeholder="Enter your Solidity code here..."
-                          className="font-mono h-40 bg-[#1F1F1F] text-white border-[#2A2A2A] focus:border-[#4A4A4A]"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex justify-end space-x-2">
-                  <CredenzaClose asChild>
-                    <Button variant="secondary" type="button">
-                      Cancel
-                    </Button>
-                  </CredenzaClose>
-                  <Button type="submit">Create Block</Button>
-                </div>
-              </form>
-            </Form>
-          </CredenzaBody>
-        </CredenzaContent>
-      </Credenza>
+      <CustomBlockModal
+        isOpen={isCredenzaOpen}
+        onOpenChange={setIsCredenzaOpen}
+        onSubmit={onSubmit}
+      />
     </div>
   )
 }
+
+// Wrap the main component with ReactFlowProvider
+const Web3BlocksComponentWrapper = () => (
+  <ReactFlowProvider>
+    <Web3BlocksComponent />
+  </ReactFlowProvider>
+)
+
+export default Web3BlocksComponentWrapper

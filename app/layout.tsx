@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Providers } from "./providers";
 import { Toaster } from 'sonner';
 
+
 const interTight = Inter_Tight({
   subsets: ['latin'],
   variable: '--font-inter-tight',
