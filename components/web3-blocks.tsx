@@ -141,7 +141,7 @@ export default function Web3BlocksComponent() {
                         onDragStart={() => handleDragStart(block)}
                         onDragEnd={(event, info) => handleDragEnd(event, info, block)}
                         className={`${block.color} text-white p-3 rounded-lg shadow-md cursor-move select-none
-                                    flex items-center justify-between border-2 ${block.borderColor} hover:border-[#FB118E] transition-colors`}
+                                    flex items-center justify-between border-[1px] ${block.borderColor} hover:border-[#FB118E] transition-colors`}
                       >
                         <span>{block.content}</span>
                         <block.icon className="w-5 h-5" />
@@ -190,7 +190,7 @@ export default function Web3BlocksComponent() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         className={`${block.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
-                                    flex items-center justify-between border-2 ${block.borderColor} hover:border-[#FB118E] transition-colors w-full max-w-[400px] relative`}
+                                    flex items-center justify-between border-[1px] ${block.borderColor} hover:border-[#FB118E] transition-colors w-full max-w-[400px] relative`}
                         onMouseEnter={() => setHoveredBlock(block.uniqueId)}
                         onMouseLeave={() => setHoveredBlock(null)}
                         onClick={() => handleBlockClick(block)}
