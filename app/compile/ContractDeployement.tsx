@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const ContractDeployment: React.FC = () => {
   const [isCopied, setIsCopied] = useState(false);
-  const contractAddress = "0x8353743c8Acc3E414FbC4E132F6A511D1A3dD74b";
+  const [contractCode, setContractCode] = useState<string>('');
+  const contractAddress = "Click deploy to get your contract address";
 
   const copyToClipboard = async () => {
     try {
@@ -16,6 +17,26 @@ const ContractDeployment: React.FC = () => {
       console.error('Failed to copy text: ', err);
     }
   };
+
+  useEffect(() => {
+    const fetchContractCode = async () => {
+      try {
+        const response = await fetch('/get-contract');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const { contractCode } = await response.json();
+        setContractCode(contractCode);
+      } catch (error) {
+        console.error('Error fetching contract code:', error);
+      }
+    };
+
+    const intervalId = setInterval(fetchContractCode, 2000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <div className="-mt-4 bg-[#141313] border-l-[1px] border-[#555555] p-8 py-12 h-screen space-y-10">
@@ -48,8 +69,9 @@ const ContractDeployment: React.FC = () => {
 
       <div className='w-full'>
       <h2 className="text-lg mb-2">Your Contract Code</h2>
-        <div className='text-[#B2B2B2] text-sm font-mono w-full bg-[#202020] border-[1px] border-[#3C3C3C] p-6'>// SPDX-License-Identifier: MIT
-        pragma solidity ^0.8.0;</div>
+        <div className='text-[#B2B2B2] text-sm font-mono w-full bg-[#202020] border-[1px] border-[#3C3C3C] p-6 whitespace-pre-wrap'>
+          {contractCode || '// Loading contract code...'}
+        </div>
       </div>
     </div>
   );
