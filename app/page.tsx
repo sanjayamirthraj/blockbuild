@@ -4,6 +4,7 @@ import Web3BlocksComponent from "../components/web3-blocks";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 
+
 export default function Home() {
   return (
     <div className="fixed w-full">
@@ -11,6 +12,7 @@ export default function Home() {
         <Navbar />
         <div className="pl-32 w-full pt-8">
           <Web3BlocksComponent />
+
         </div>
         <Sidebar />
       </main>

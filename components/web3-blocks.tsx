@@ -49,6 +49,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 import { Trash2 } from 'lucide-react'
+import Link from 'next/link'
 
 const blockTypes = [
   { id: 'start', content: 'Connect Wallet', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
@@ -81,6 +82,7 @@ export default function Web3BlocksComponent() {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [flowSummary, setFlowSummary] = useState([])
+  const [toolbarVisible, setToolbarVisible] = useState({})
 
   // Initialize the form
   const form = useForm({
@@ -94,7 +96,7 @@ export default function Web3BlocksComponent() {
   const handleDeleteNode = (nodeId) => {
     setNodes((nds) => nds.filter((node) => node.id !== nodeId))
     setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId))
-    setFlowSummary((prevSummary) => prevSummary.filter((item) => item.fromId !== nodeId && item.toId !== nodeId))
+    setFlowSummary((prevSummary) => prevSummary.filter((item) => item.id !== nodeId))
   }
 
   const handleAddNode = (sourceNodeId, block) => {
@@ -110,6 +112,9 @@ export default function Web3BlocksComponent() {
         uniqueId: newNodeId,
         handleDeleteNode,
         handleAddNode,
+        toolbarVisible: false,
+        setToolbarVisible: (visible) =>
+          setToolbarVisible(prev => ({ ...prev, [newNodeId]: visible })),
       },
     }
     setNodes((nds) => [...nds, newNode])
@@ -132,6 +137,9 @@ export default function Web3BlocksComponent() {
         uniqueId: newNodeId,
         handleDeleteNode,
         handleAddNode,
+        toolbarVisible: false,
+        setToolbarVisible: (visible) =>
+          setToolbarVisible(prev => ({ ...prev, [newNodeId]: visible })),
       },
     }
     setNodes((nds) => [...nds, newNode])
@@ -192,22 +200,27 @@ export default function Web3BlocksComponent() {
     const targetNode = nodes.find((node) => node.id === targetId)
 
     setFlowSummary((prevSummary) => {
-      // Check if the connection already exists
-      const exists = prevSummary.some(
-        (item) => item.fromId === sourceId && item.toId === targetId
-      )
-      if (!exists) {
+      const newItem = {
+        content: targetNode.data.content,
+        id: targetId
+      }
+
+      // If the summary is empty, add the source node first
+      if (prevSummary.length === 0) {
         return [
-          ...prevSummary,
-          {
-            from: sourceNode.data.content,
-            to: targetNode.data.content,
-            fromId: sourceId,
-            toId: targetId,
-          },
+          { content: sourceNode.data.content, id: sourceId },
+          newItem
         ]
+      }
+
+      // Check if the target node already exists in the summary
+      const existingIndex = prevSummary.findIndex(item => item.id === targetId)
+      if (existingIndex !== -1) {
+        // If it exists, remove it and all subsequent items
+        return [...prevSummary.slice(0, existingIndex), newItem]
       } else {
-        return prevSummary
+        // If it doesn't exist, add it to the end
+        return [...prevSummary, newItem]
       }
     })
   }
@@ -218,52 +231,58 @@ export default function Web3BlocksComponent() {
     const hasOutgoingEdges = edges.some(edge => edge.source === id)
 
     return (
-      <div
-        className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
-                    flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${
-          isDragging ? 'opacity-70' : ''
-        } relative group`}
-      >
-        <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
-        <span>{data.content}</span>
-        <data.icon className="w-4 h-4" />
-        <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
-
-        {/* Delete button */}
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => data.handleDeleteNode(id)}
-          className="absolute -top-3 -right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+      <>
+        <NodeToolbar
+          isVisible={data.toolbarVisible}
+          position={hasOutgoingEdges ? Position.Bottom : Position.Right}
         >
-          <Trash2 className="w-4 h-4" />
-        </Button>
+          <div className="flex space-x-2">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => data.handleDeleteNode(id)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
 
-        {/* Hover actions for adding new blocks */}
-        {!hasOutgoingEdges && (
-          <div className="absolute top-full mt-2 left-0 opacity-0 group-hover:opacity-100 transition-opacity">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {blockTypes.map((block) => (
-                  <DropdownMenuItem
-                    key={block.id}
-                    onSelect={() => data.handleAddNode(id, block)}
-                  >
-                    {block.content}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {!hasOutgoingEdges && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {blockTypes.map((block) => (
+                    <DropdownMenuItem
+                      key={block.id}
+                      onSelect={() => data.handleAddNode(id, block)}
+                    >
+                      {block.content}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
-        )}
-      </div>
+        </NodeToolbar>
+
+        <div
+          className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
+                      flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''
+            } relative`}
+          onMouseEnter={() => data.setToolbarVisible(true)}
+          onMouseLeave={() => data.setToolbarVisible(false)}
+        >
+          <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
+          <span>{data.content}</span>
+          <data.icon className="w-4 h-4" />
+          <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
+        </div>
+      </>
     )
   }
+
 
   const nodeTypes = {
     blockNode: BlockNode,
@@ -360,7 +379,9 @@ export default function Web3BlocksComponent() {
                 Clear
               </Button>
               <Button onClick={handleFinish} className="bg-[#322131] hover:bg-[#21173E] text-white">
-                Compile
+                <Link href="/compile">
+                  Compile
+                </Link>
               </Button>
             </div>
           )}
@@ -375,7 +396,9 @@ export default function Web3BlocksComponent() {
             onEdgesChange={onEdgesChange}
             onConnect={handleConnect}
             nodeTypes={nodeTypes}
-            defaultEdgeOptions={{ type: 'step' }} // Set edge type to 'step' for square lines
+            defaultEdgeOptions={{ type: 'step' }}
+            snapToGrid={true}
+            snapGrid={[15, 15]}
           >
             <Background />
             <Controls />
@@ -395,7 +418,7 @@ export default function Web3BlocksComponent() {
             <div key={index} className="mb-2 flex items-center">
               <span className="mr-2 text-[#FB118E]">{index + 1}.</span>
               <span className="text-white">
-                {item.from} &rarr; {item.to}
+                {item.content}
               </span>
             </div>
           ))}
