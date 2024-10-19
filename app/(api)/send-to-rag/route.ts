@@ -10,14 +10,14 @@ const openai = new OpenAI({
 export async function POST(req: NextRequest, res: NextResponse) {
     const { message, name } = await req.json();
     try {
-        const message = "methods: [methods with name 'swap' and parameters: [parameter with name 'coinA' and type 'address', parameter with name 'coinB' and type 'address']], structs: []";
+
         const options = {
             method: 'POST',
             headers: {
                 Authorization: 'Bearer sid-sk-rY7kT9_Mj1ELODrHNZ4d3111yuVnjlUl-GgjeVmVRMay',
                 'Content-Type': 'application/json'
             },
-            body: `{"query":"You are a helpful coding AI assistant that has access to a highly advanced search engine that helps you find documents that contain information about the user. Your answers are concise, informative, and use the context provided by the document search. Develop a solidity code for a smart contract that is secure and efficient. The following is an object that lists all the methods and their parameters. Only return the smart contract code. Do not make placeholder comments. Implement all methods. Do not have comments in the code. Do not return anything else. This is the spec:${message},","limit":1}`
+            body: `{"query":"Develop a solidity code for a smart contract. You will be given the name of the contract as  DemoContract that is secure and efficient. The following is an object that lists all the methods and their parameters. Only return the smart contract code. Do not make placeholder comments. Implement all methods. Do not have comments in the code. Do not return anything else. This is the spec:${message}.","limit":1}`
 
         };
         fetch('https://top-tier-wasserstein-distance.sid.ai/query', options)

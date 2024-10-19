@@ -1,48 +1,38 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IERC20 {
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) external returns (bool);
-
-    function transfer(
-        address recipient,
-        uint256 amount
-    ) external returns (bool);
-
-    function balanceOf(address account) external view returns (uint256);
+interface IDEX {
+    function swapTokens(address tokenA, address tokenB, uint amount) external;
 }
 
-contract SecureSwap {
-    function swap(address coinA, address coinB) external {
-        IERC20 tokenA = IERC20(coinA);
-        IERC20 tokenB = IERC20(coinB);
+contract WalletConnector {
+    address public owner;
+    bool public isConnected;
 
-        uint256 amountA = tokenA.balanceOf(msg.sender);
-        uint256 amountB = tokenB.balanceOf(msg.sender);
+    IDEX public dex;
 
-        require(amountA > 0, "Insufficient balance of coinA");
-        require(amountB > 0, "Insufficient balance of coinB");
+    constructor(address _dexAddress) {
+        owner = msg.sender;
+        dex = IDEX(_dexAddress);
+    }
 
-        require(
-            tokenA.transferFrom(msg.sender, address(this), amountA),
-            "Transfer of coinA failed"
-        );
-        require(
-            tokenB.transferFrom(msg.sender, address(this), amountB),
-            "Transfer of coinB failed"
-        );
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the owner");
+        _;
+    }
 
-        require(
-            tokenA.transfer(msg.sender, amountA),
-            "Return transfer of coinA failed"
-        );
-        require(
-            tokenB.transfer(msg.sender, amountB),
-            "Return transfer of coinB failed"
-        );
+    function connectWallet() external onlyOwner {
+        require(!isConnected, "Already connected");
+        isConnected = true;
+    }
+
+    function swapTokens(address tokenA, address tokenB, uint amount) external onlyOwner {
+        require(isConnected, "Wallet not connected");
+        dex.swapTokens(tokenA, tokenB, amount);
+    }
+
+    function disconnect() external onlyOwner {
+        require(isConnected, "Already disconnected");
+        isConnected = false;
     }
 }

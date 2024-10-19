@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     try {
         const filePath = 'test.sol'
         const source = fs.readFileSync(filePath, 'utf8');
-        const contractName = path.basename(filePath).split('.')[0];
+        const contractName = "WalletConnector"
         const input = {
             language: 'Solidity',
             sources: {
@@ -28,9 +28,10 @@ export async function POST(req: NextRequest) {
         };
 
         const output = JSON.parse(solc.compile(JSON.stringify(input)));
-        const bytecode = output.contracts[filePath][contractName].evm.bytecode.object;
+        //console.log(output.contracts['test.sol'].WalletConnector.evm.bytecode.object)
+        const bytecode = output.contracts['test.sol'].WalletConnector.evm.bytecode.object;
         console.log(bytecode);
-        const abi = output.contracts[filePath][contractName].abi;
+        const abi = (output.contracts['test.sol'].WalletConnector.abi);
         console.log(abi);
         return new NextResponse(JSON.stringify({ bytecode: bytecode, abi: abi }));
     } catch (error) {
