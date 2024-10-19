@@ -1,13 +1,14 @@
 "use client"
 
 // React and Next.js imports
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 
 // UI components and utilities
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+
 
 // Third-party libraries
 import { useForm } from "react-hook-form"
@@ -42,10 +43,13 @@ import ReactFlow, {
     getOutgoers,
     useReactFlow,
     ReactFlowProvider,
+    BaseEdge,
+    NodeProps,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
 import CustomBlockModal from './CustomBlockModal'
+import SwapNode from './SwapNode'
 
 // Define the different block types with their properties
 const blockTypes = [
@@ -73,6 +77,33 @@ const formSchema = z.object({
     solidityCode: z.string().min(1, "Solidity code is required"),
 })
 
+// Define BlockNode component outside of Web3BlocksComponent
+const BlockNode = ({ data, isDragging, id }) => {
+    const [selectedNode, setSelectedNode] = useState(null);
+    const isSelected = id === selectedNode;
+    if (data.id === 'swap') {
+        return <SwapNode data={data} isConnectable={true} />;
+    }
+    return (
+        <div
+            className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
+                flex items-center justify-between border-2 transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''}
+                ${isSelected ? 'border-white shadow-glow' : data.borderColor} ${isSelected ? '' : data.hoverBorderColor} relative`}
+        >
+            {id !== 'start' && <Handle type="target" position={Position.Top} style={{ background: '#555' }} />}
+            <span>{data.content}</span>
+            <data.icon className="w-4 h-4" />
+            <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
+        </div>
+    );
+};
+
+// Define nodeTypes outside of the component
+const nodeTypes = {
+    blockNode: BlockNode,
+    swapNode: SwapNode,
+}
+
 // Main component for the DeFi Blocks builder
 function Web3BlocksComponent() {
     // State variables
@@ -86,6 +117,7 @@ function Web3BlocksComponent() {
     const router = useRouter()
     const [showClearButton, setShowClearButton] = useState(false)
     const edgeReconnectSuccessful = useRef(true)
+    const [selectedNode, setSelectedNode] = useState(null)
 
     // Initialize the form
     const form = useForm({
@@ -194,9 +226,9 @@ function Web3BlocksComponent() {
     }
 
     // Function to handle node click (currently logs the node ID)
-    const handleNodeClick = (nodeId) => {
-        console.log("Node clicked:", nodeId)
-    }
+    const handleNodeClick = useCallback((event, node) => {
+        setSelectedNode(node.id)
+    }, [])
 
     // Function to update the flow summary based on the connected nodes
     const updateFlowSummary = (sourceId, targetId) => {
@@ -227,27 +259,6 @@ function Web3BlocksComponent() {
                 return [...prevSummary, newItem]
             }
         })
-    }
-
-    // Custom node component for React Flow
-    const BlockNode = ({ data, isDragging, id }) => {
-        return (
-            <div
-                className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
-                    flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''
-                    } relative`}
-            >
-                <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
-                <span>{data.content}</span>
-                <data.icon className="w-4 h-4" />
-                <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
-            </div>
-        )
-    }
-
-    // Define custom node types for React Flow
-    const nodeTypes = {
-        blockNode: BlockNode,
     }
 
     const { getNodes, getEdges } = useReactFlow();
@@ -312,6 +323,24 @@ function Web3BlocksComponent() {
 
         edgeReconnectSuccessful.current = true;
     }, []);
+
+    // Custom edge styles
+    const edgeStyles = {
+        default: {
+            stroke: '#555',
+            strokeWidth: 2,
+            transition: 'stroke 0.3s, stroke-width 0.3s',
+        },
+        selected: {
+            stroke: '#FE007A',
+            strokeWidth: 3,
+        },
+    }
+
+    // Edge update function
+    const edgeUpdateHandler = useCallback((oldEdge, newConnection) => {
+        return { ...oldEdge, ...newConnection }
+    }, [])
 
     return (
         <div className="flex h-screen bg-[#141313] pt-8 selectable-none">
@@ -438,11 +467,14 @@ function Web3BlocksComponent() {
                         snapToGrid={true}
                         snapGrid={[15, 15]}
                         isValidConnection={isValidConnection}
+                        onNodeClick={handleNodeClick}
+                        edgeUpdaterRadius={10}
+                        onEdgeUpdate={edgeUpdateHandler}
                     >
                         <Background />
                         <Controls />
                         <MiniMap
-                            className='bg-black mb-20'
+                            className='bg-black rounded-lg'
                             nodeColor={(node) => '#FE007A'}
                             nodeStrokeColor="transparent"
                             nodeStrokeWidth={3}
@@ -453,6 +485,19 @@ function Web3BlocksComponent() {
                             pannable
                             zoomable
                         />
+                        {edges.map((edge) => (
+                            <BaseEdge
+                                key={edge.id}
+                                id={edge.id}
+                                source={edge.source}
+                                target={edge.target}
+                                style={
+                                    selectedNode && (edge.source === selectedNode || edge.target === selectedNode)
+                                        ? edgeStyles.selected
+                                        : edgeStyles.default
+                                }
+                            />
+                        ))}
                     </ReactFlow>
                 </div>
             </motion.div>
