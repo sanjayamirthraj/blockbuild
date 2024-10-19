@@ -6,32 +6,15 @@ import { useRouter } from 'next/navigation'
 
 // UI components and utilities
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
+
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import {
-  Credenza,
-  CredenzaBody,
-  CredenzaClose,
-  CredenzaContent,
-  CredenzaDescription,
-  CredenzaHeader,
-  CredenzaTitle,
-} from "@/components/credeza"
 
 // Third-party libraries
 import { useForm } from "react-hook-form"
@@ -66,6 +49,7 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
+import CustomBlockModal from './CustomBlockModal'
 
 // Define the different block types with their properties
 const blockTypes = [
@@ -463,63 +447,11 @@ export default function Web3BlocksComponent() {
       </motion.div>
 
       {/* Modal for adding custom blocks */}
-      <Credenza open={isCredenzaOpen} onOpenChange={setIsCredenzaOpen}>
-        <CredenzaContent className="border-white/10">
-          <CredenzaHeader>
-            <CredenzaTitle className="text-white">Add a Custom Block</CredenzaTitle>
-            <CredenzaDescription className="text-white/80">
-              Enter your Solidity code below to create a custom block.
-            </CredenzaDescription>
-          </CredenzaHeader>
-          <CredenzaBody>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="blockName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Block Name</FormLabel>
-                      <FormControl>
-                        <input
-                          {...field}
-                          className="w-full p-2 rounded bg-[#1F1F1F] text-white border border-[#2A2A2A] focus:border-[#4A4A4A]"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="solidityCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Solidity Code</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          placeholder="Enter your Solidity code here..."
-                          className="font-mono h-40 bg-[#1F1F1F] text-white border-[#2A2A2A] focus:border-[#4A4A4A]"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex justify-end space-x-2">
-                  <CredenzaClose asChild>
-                    <Button variant="secondary" type="button">
-                      Cancel
-                    </Button>
-                  </CredenzaClose>
-                  <Button type="submit">Create Block</Button>
-                </div>
-              </form>
-            </Form>
-          </CredenzaBody>
-        </CredenzaContent>
-      </Credenza>
+      <CustomBlockModal
+        isOpen={isCredenzaOpen}
+        onOpenChange={setIsCredenzaOpen}
+        onSubmit={onSubmit}
+      />
     </div>
   )
 }
