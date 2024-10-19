@@ -54,12 +54,14 @@ const CompilePage: React.FC = () => {
                             <h2 className="text-lg mb-4">Flow Graph</h2>
                             <FlowGraph nodes={nodes} edges={edges} flowSummary={flowSummary} />
                         </div>
-                        <Button variant="ghost" className="mb-4 group text-white/50 hover:text-white hover:bg-white/5">
-                            <ArrowLeft className="w-4 h-4 mr-1 translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out" />
-                            Back
-                        </Button>
-                        <Button 
-                            variant="ghost" 
+                        <Link href="/">
+                            <Button variant="ghost" className="mb-4 group text-white/50 hover:text-white hover:bg-white/5">
+                                <ArrowLeft className="w-4 h-4 mr-1 translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out" />
+                                Back
+                            </Button>
+                        </Link>
+                        <Button
+                            variant="ghost"
                             className="ml-4 mb-4 group text-white/50 hover:text-white hover:bg-white/5"
                             onClick={handleCompile}
                         >
