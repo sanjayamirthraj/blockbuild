@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun, Settings, FolderKanban, FileText, GraduationCap, Bug } from "lucide-react";
 import Link from "next/link";
 
+
 export default function Navbar() {
     const { theme, setTheme } = useTheme();
     const [isActive, setIsActive] = useState(false);
+    
 
     useEffect(() => {
         // Any client-side logic that might affect class names
@@ -38,6 +40,7 @@ export default function Navbar() {
                         <NavItem icon={<GraduationCap size={18} />} text="Tutorials" href="/tutorials" />
                         <NavItem icon={<Bug size={18} />} text="Report Bug" href="/report-bug" />
                     </div>
+                  
                 </div>
             </div>
         </nav>
