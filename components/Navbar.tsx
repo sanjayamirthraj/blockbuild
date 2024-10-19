@@ -7,6 +7,7 @@ import Link from "next/link";
 export default function Navbar() {
     const { theme, setTheme } = useTheme();
     const [isActive, setIsActive] = useState(false);
+    
 
     useEffect(() => {
         // Any client-side logic that might affect class names

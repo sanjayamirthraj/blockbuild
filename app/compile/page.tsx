@@ -27,7 +27,7 @@ const CompilePage: React.FC = () => {
     const [nodes, setNodes] = useState([]);
     const [edges, setEdges] = useState([]);
     const [flowSummary, setFlowSummary] = useState([]);
-    const [apiResponse, setApiResponse] = useState(null); // Add state for API response
+    const [apiResponse, setApiResponse] = useState("ABI Will show up here"); 
 
     useEffect(() => {
         const nodesParam = searchParams.get('nodes');
@@ -48,37 +48,33 @@ const CompilePage: React.FC = () => {
         };
         console.log('Flow Summary JSON:', JSON.stringify(flowSummaryJSON, null, 2));
         
-        // Remove curly braces and stringify the object
         const bodyofthecall = JSON.stringify(flowSummaryJSON)
             .replace(/[{}"]/g, '')
             .replace(/:/g, ': ')
             .replace(/,/g, ', ');
        console.log(bodyofthecall)
-        const outputs = await fetch('/send-to-rag', {
+        const response = await fetch('/send-to-rag', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 message: bodyofthecall,
-                name: 'SecureEfficientSwap',
+                name: '',
             }),
-         })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Contract compilation result:', data);
-        setApiResponse(data); // Store the API response in state
-    })
-    .catch(error => {
-        console.error('Error compiling contract:', error);
-    });
-    console.log(outputs)
+        });
+        const outputs = await response.json();
+        const resultofcompilation = await fetch('/compile-contract', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+                body: JSON.stringify({ contractName: "TokenSwap", name: outputs.contractName }),
+            });
+            const compilationResult = await resultofcompilation.json();
+            setApiResponse(compilationResult.abi); // Store the API response in state
 
-    const resultofcompilation = await fetch('/compile-contract', {
-        method: 'POST',
-        body: JSON.stringify({ contractName: "TokenSwap" }),
-    })
-    console.log(resultofcompilation)
+        // console.log(compilationResult);
     };
 
    
@@ -134,12 +130,12 @@ const CompilePage: React.FC = () => {
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                     onClick={async () => {
                         try {
-                            const response = await fetch('/compile-contract', {
+                            const response = await fetch('/deploy-contract', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
-                                body: JSON.stringify({ contractName: "TokenSwap" }),
+                                body: JSON.stringify({ abi: apiResponse.abi, bytecode: apiResponse.bytecode, args: [] }),
                             });
                             const result = await response.json();
                             console.log('Compilation result:', result);
@@ -153,7 +149,7 @@ const CompilePage: React.FC = () => {
                     }}
                 >
                     <BlocksIcon className="w-4 h-4 mr-2" />
-                    Practice Contract
+                    Deploy Contract
                 </Button>
             </div>
         </div>
