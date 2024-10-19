@@ -36,7 +36,7 @@ const SwapNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
                         ))}
                     </SelectContent>
                 </Select>
-
+                <div>for</div>
                 <Select onValueChange={onToCurrencyChange} value={toCurrency}>
                     <SelectTrigger className="w-full bg-[#113731] border-[1px] border-[#245C3D]">
                         <SelectValue placeholder="To" />
