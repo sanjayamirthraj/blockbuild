@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         const formattedCode = await generateAndFormatSolidityCode(message);
         // console.log(formattedCode);
         fs.writeFileSync(`test.sol`, formattedCode);
-        return new NextResponse(JSON.stringify({ message: "Solidity file created successfully" }));
+        return new NextResponse(JSON.stringify({ fileName: "test.sol", contractName: "SecureEfficientSwap" }));
     } catch (error) {
         return new NextResponse(JSON.stringify({ error: "send-to-rag is not working" }), { status: 500 });
     }

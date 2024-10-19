@@ -13,7 +13,7 @@ async function DeployContractToRootstock(contractABI: any, contractBytecode: str
 }
 
 export async function POST(req: NextRequest, res: NextResponse) {
-    const { contractName, contractABI, contractBytecode, deploymentNetwork, signerPrivateKey, args } = await req.json();
+    const { contractABI, contractBytecode, deploymentNetwork, args } = await req.json();
     const contractNameTest = "SecureEfficientSwap";
     // const { deployContract } = useDeployContract()
 

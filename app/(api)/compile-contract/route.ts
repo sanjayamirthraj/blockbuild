@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
         console.log(bytecode);
         const abi = output.contracts[filePath][contractName].abi;
         console.log(abi);
-        return new NextResponse(JSON.stringify({ message: "Contract compiled successfully" }));
+        return new NextResponse(JSON.stringify({ bytecode: bytecode, abi: abi }));
     } catch (error) {
         console.error(error);
         return new NextResponse(JSON.stringify({ error: "Contract deployment failed" }), { status: 500 });
