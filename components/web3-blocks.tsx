@@ -120,6 +120,7 @@ export default function Web3BlocksComponent() {
     setNodes((nds) => nds.filter((node) => node.id !== nodeId))
     setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId))
     setFlowSummary((prevSummary) => prevSummary.filter((item) => item.id !== nodeId))
+    toast.success('Block deleted')
   }
 
   // Function to add a new node connected to a source node
@@ -144,6 +145,7 @@ export default function Web3BlocksComponent() {
     setEdges((eds) => [...eds, newEdge])
 
     updateFlowSummary(sourceNodeId, newNodeId)
+    toast.success(`${block.content} block added`)
   }
 
   // Function to add a block to the canvas
@@ -162,6 +164,7 @@ export default function Web3BlocksComponent() {
       },
     }
     setNodes((nds) => [...nds, newNode])
+    toast.success(`${block.content} block added`)
   }
 
   // Effect to check if 'start' and 'end' nodes are present
