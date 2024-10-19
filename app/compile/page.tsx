@@ -9,6 +9,7 @@ import ContractCode from './ContractCode';
 import { Button } from '@/components/ui/button';
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
+import { ArrowLeft } from 'lucide-react';
 
 const CompilePage: React.FC = () => {
     const searchParams = useSearchParams();
@@ -34,14 +35,16 @@ const CompilePage: React.FC = () => {
 
             <div className="flex-grow flex w-full px-32 py-16">
                 <main className="flex-grow flex">
-                    <section className="w-1/2 p-4">
-                        <Button>
+                    <section className="w-1/2 p-4 flex flex-col items-start">
+
+                        <Button variant="ghost" className="group text-white/50 hover:text-white hover:bg-white/5">
+                            <ArrowLeft className="w-4 h-4 mr-1 translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out" />
                             <Link href="/">Go Back</Link>
                         </Button>
-                        
-                        <h2 className="text-2xl mb-4">Flow Graph</h2>
-                        
-                        <FlowGraph nodes={nodes} edges={edges} flowSummary={flowSummary} />
+                        <div className="flex flex-col ml-4">
+                            <h2 className=" mt-2 text-xl mb-4">Flow Graph</h2>
+                            <FlowGraph nodes={nodes} edges={edges} flowSummary={flowSummary} />
+                        </div>
                     </section>
 
                     <section className="w-1/2 p-4">

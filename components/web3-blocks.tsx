@@ -1,9 +1,28 @@
 "use client"
 
+// React and Next.js imports
 import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+
+// UI components and utilities
 import { Button } from "@/components/ui/button"
-import { Wallet, ArrowRightLeft, Repeat, MessageSquare, DollarSign, Power, ChevronRight, ChevronLeft, Plus, Info, Code, ArrowRight } from 'lucide-react'
-import { motion } from "framer-motion"
+import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
 import {
   Credenza,
   CredenzaBody,
@@ -13,20 +32,26 @@ import {
   CredenzaHeader,
   CredenzaTitle,
 } from "@/components/credeza"
+
+// Third-party libraries
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { motion } from "framer-motion"
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
+  Wallet,
+  ArrowRightLeft,
+  Repeat,
+  MessageSquare,
+  DollarSign,
+  Power,
+  ChevronRight,
+  ChevronLeft,
+  Plus,
+  Info,
+  Code,
+  Trash2,
+} from 'lucide-react'
 import ReactFlow, {
   Background,
   Controls,
@@ -41,18 +66,10 @@ import ReactFlow, {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu"
-import { Trash2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
+// Define the different block types with their properties
 const blockTypes = [
+  // Each block represents an action in the DeFi flow
   { id: 'start', content: 'Connect Wallet', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
   { id: 'swap', content: 'Swap Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: ArrowRightLeft },
   { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: Repeat },
@@ -62,6 +79,7 @@ const blockTypes = [
   { id: 'end', content: 'Disconnect', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
 ]
 
+// Group blocks into categories for the sidebar
 const groupedBlocks = {
   "Trigger Actions": blockTypes.filter(block => ['start', 'end'].includes(block.id)),
   "Token Actions": blockTypes.filter(block => ['swap', 'stake', 'allocate'].includes(block.id)),
@@ -69,13 +87,15 @@ const groupedBlocks = {
   "Governance": blockTypes.filter(block => block.id === 'governance'),
 }
 
-// Define the form schema
+// Form validation schema using Zod
 const formSchema = z.object({
   blockName: z.string().min(1, "Block name is required"),
   solidityCode: z.string().min(1, "Solidity code is required"),
 })
 
+// Main component for the DeFi Blocks builder
 export default function Web3BlocksComponent() {
+  // State variables
   const [showFinishButton, setShowFinishButton] = useState(false)
   const [isOpen, setIsOpen] = useState(true)
   const [isCredenzaOpen, setIsCredenzaOpen] = useState(false)
@@ -83,7 +103,6 @@ export default function Web3BlocksComponent() {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [flowSummary, setFlowSummary] = useState([])
-  const [toolbarVisible, setToolbarVisible] = useState({})
   const router = useRouter()
 
   // Initialize the form
@@ -95,12 +114,14 @@ export default function Web3BlocksComponent() {
     },
   })
 
+  // Function to delete a node and its associated edges
   const handleDeleteNode = (nodeId) => {
     setNodes((nds) => nds.filter((node) => node.id !== nodeId))
     setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId))
     setFlowSummary((prevSummary) => prevSummary.filter((item) => item.id !== nodeId))
   }
 
+  // Function to add a new node connected to a source node
   const handleAddNode = (sourceNodeId, block) => {
     const newNodeId = Date.now().toString()
     const sourceNode = nodes.find(node => node.id === sourceNodeId)
@@ -127,6 +148,7 @@ export default function Web3BlocksComponent() {
     updateFlowSummary(sourceNodeId, newNodeId)
   }
 
+  // Function to add a block to the canvas
   const addBlock = (block) => {
     const newNodeId = Date.now().toString()
     const newNode = {
@@ -147,17 +169,20 @@ export default function Web3BlocksComponent() {
     setNodes((nds) => [...nds, newNode])
   }
 
+  // Effect to check if 'start' and 'end' nodes are present
   useEffect(() => {
     const hasStart = nodes.some(node => node.data.id === 'start')
     const hasEnd = nodes.some(node => node.data.id === 'end')
     setShowFinishButton(hasStart && hasEnd)
   }, [nodes])
 
+  // Function to handle the 'Finish' button click
   const handleFinish = () => {
     console.log("Finished! Transaction flow:", flowSummary)
     // Add your logic here for what should happen when the Finish button is clicked
   }
 
+  // Function to clear the canvas
   const handleClear = () => {
     setNodes([])
     setEdges([])
@@ -165,10 +190,12 @@ export default function Web3BlocksComponent() {
     toast.success('Blocks cleared')
   }
 
+  // Function to open the modal for adding a custom block
   const handleAddCustomBlock = () => {
     setIsCredenzaOpen(true)
   }
 
+  // Form submission handler for adding a custom block
   const onSubmit = (values) => {
     const newCustomBlock = {
       id: 'custom',
@@ -186,17 +213,18 @@ export default function Web3BlocksComponent() {
     toast.success('Custom block added!')
   }
 
+  // Function to handle node click (currently logs the node ID)
   const handleNodeClick = (nodeId) => {
-    // Handle node click if needed
     console.log("Node clicked:", nodeId)
   }
 
-  // Handle edge creation
+  // Function to handle connecting two nodes
   const handleConnect = (params) => {
     setEdges((eds) => addEdge({ ...params, type: 'step' }, eds))
     updateFlowSummary(params.source, params.target)
   }
 
+  // Function to update the flow summary based on the connected nodes
   const updateFlowSummary = (sourceId, targetId) => {
     const sourceNode = nodes.find((node) => node.id === sourceId)
     const targetNode = nodes.find((node) => node.id === targetId)
@@ -204,14 +232,14 @@ export default function Web3BlocksComponent() {
     setFlowSummary((prevSummary) => {
       const newItem = {
         content: targetNode.data.content,
-        id: targetId
+        id: targetId,
       }
 
       // If the summary is empty, add the source node first
       if (prevSummary.length === 0) {
         return [
           { content: sourceNode.data.content, id: sourceId },
-          newItem
+          newItem,
         ]
       }
 
@@ -227,13 +255,14 @@ export default function Web3BlocksComponent() {
     })
   }
 
-  // Custom node component for blocks
+  // Custom node component for React Flow
   const BlockNode = ({ data, isDragging, id }) => {
     const edges = useStore((state) => state.edges)
     const hasOutgoingEdges = edges.some(edge => edge.source === id)
 
     return (
       <>
+        {/* Toolbar with delete and add actions */}
         <NodeToolbar
           isVisible={data.toolbarVisible}
           position={hasOutgoingEdges ? Position.Bottom : Position.Right}
@@ -269,6 +298,7 @@ export default function Web3BlocksComponent() {
           </div>
         </NodeToolbar>
 
+        {/* Block node representation */}
         <div
           className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
                       flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''
@@ -285,15 +315,16 @@ export default function Web3BlocksComponent() {
     )
   }
 
-
+  // Define custom node types for React Flow
   const nodeTypes = {
     blockNode: BlockNode,
   }
 
   return (
     <div className="flex h-screen bg-[#141313] pt-8 selectable-none">
+      {/* Sidebar */}
       <div className="relative translate-y-[1px]">
-
+        {/* Toggle sidebar button */}
         <Button
           variant="outline"
           size="icon"
@@ -303,6 +334,7 @@ export default function Web3BlocksComponent() {
           {isOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </Button>
 
+        {/* Info icon */}
         <div className="absolute right-4 top-4 w-10 h-10 flex items-center justify-center cursor-pointer group">
           <Info className="size-8 text-white/60 group-hover:shadow-lg transition-shadow duration-300" />
           <div className="absolute hidden group-hover:block bg-gray-800 text-white/60 text-xs rounded-md p-2 -top-10 right-0">
@@ -310,7 +342,7 @@ export default function Web3BlocksComponent() {
           </div>
         </div>
 
-        {/* tab bar */}
+        {/* Sidebar content */}
         <motion.div
           initial={false}
           animate={{ width: isOpen ? "18.4rem" : "0rem" }}
@@ -354,14 +386,15 @@ export default function Web3BlocksComponent() {
             </div>
           </div>
         </motion.div>
-
       </div>
 
+      {/* Main canvas area */}
       <motion.div
         className="flex-1 max-w-[52rem] flex flex-col ml-8"
         animate={{ marginLeft: isOpen ? "1rem" : "2rem" }}
         transition={{ duration: 0.3 }}
       >
+        {/* Header */}
         <div className="flex justify-between items-center mt-4 mb-4">
           <div className="flex items-center gap-4 ml-8">
             <h2 className="text-2xl text-white mt-1">Project Name</h2>
@@ -375,17 +408,19 @@ export default function Web3BlocksComponent() {
             </div>
           </div>
           {showFinishButton && (
-
             <div className="flex gap-2">
               <Button onClick={handleClear} className="px-6 hover:bg-[#323232] text-white">
                 Clear
               </Button>
-              <Button onClick={() => {
-                const encodedNodes = encodeURIComponent(JSON.stringify(nodes));
-                const encodedEdges = encodeURIComponent(JSON.stringify(edges));
-                const encodedFlowSummary = encodeURIComponent(JSON.stringify(flowSummary));
-                router.push(`/compile?nodes=${encodedNodes}&edges=${encodedEdges}&flowSummary=${encodedFlowSummary}`);
-              }} className="bg-[#322131] hover:bg-[#21173E] text-white">
+              <Button
+                onClick={() => {
+                  const encodedNodes = encodeURIComponent(JSON.stringify(nodes))
+                  const encodedEdges = encodeURIComponent(JSON.stringify(edges))
+                  const encodedFlowSummary = encodeURIComponent(JSON.stringify(flowSummary))
+                  router.push(`/compile?nodes=${encodedNodes}&edges=${encodedEdges}&flowSummary=${encodedFlowSummary}`)
+                }}
+                className="bg-[#322131] hover:bg-[#21173E] text-white"
+              >
                 Compile
               </Button>
             </div>
@@ -412,6 +447,7 @@ export default function Web3BlocksComponent() {
         </div>
       </motion.div>
 
+      {/* Flow summary on the right */}
       <motion.div
         className="ml-8 px-8 pt-2 bg-[#141313] border-t-[1px] border-l-[1px] border-[#555555] z-10 relative right-0 h-screen"
         animate={{ width: isOpen ? "30rem" : "40rem" }}
@@ -422,17 +458,15 @@ export default function Web3BlocksComponent() {
           {flowSummary.map((item, index) => (
             <div key={index} className="mb-2 flex items-center">
               <span className="mr-2 text-[#FB118E]">{index + 1}.</span>
-              <span className="text-white">
-                {item.content}
-              </span>
+              <span className="text-white">{item.content}</span>
             </div>
           ))}
         </div>
       </motion.div>
 
-      {/* modal add blocks */}
+      {/* Modal for adding custom blocks */}
       <Credenza open={isCredenzaOpen} onOpenChange={setIsCredenzaOpen}>
-        <CredenzaContent className='border-white/10'>
+        <CredenzaContent className="border-white/10">
           <CredenzaHeader>
             <CredenzaTitle className="text-white">Add a Custom Block</CredenzaTitle>
             <CredenzaDescription className="text-white/80">
@@ -477,7 +511,9 @@ export default function Web3BlocksComponent() {
                 />
                 <div className="flex justify-end space-x-2">
                   <CredenzaClose asChild>
-                    <Button variant="secondary" type="button">Cancel</Button>
+                    <Button variant="secondary" type="button">
+                      Cancel
+                    </Button>
                   </CredenzaClose>
                   <Button type="submit">Create Block</Button>
                 </div>
