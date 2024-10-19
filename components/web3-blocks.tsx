@@ -89,6 +89,7 @@ export default function Web3BlocksComponent() {
   const [flowSummary, setFlowSummary] = useState([])
   const router = useRouter()
   const [toolbarVisibility, setToolbarVisibility] = useState({})
+  const [showClearButton, setShowClearButton] = useState(false)
 
   // Initialize the form
   const form = useForm({
@@ -156,6 +157,7 @@ export default function Web3BlocksComponent() {
     const hasStart = nodes.some(node => node.data.id === 'start')
     const hasEnd = nodes.some(node => node.data.id === 'end')
     setShowFinishButton(hasStart && hasEnd)
+    setShowClearButton(nodes.length > 0)
   }, [nodes])
 
   // Function to handle the 'Finish' button click
@@ -389,11 +391,13 @@ export default function Web3BlocksComponent() {
               <Label htmlFor="tutorial-mode" className="text-white">Toggle Hover</Label>
             </div>
           </div>
-          {showFinishButton && (
-            <div className="flex gap-2">
+          <div className="flex gap-2">
+            {showClearButton && (
               <Button onClick={handleClear} className="px-6 hover:bg-[#323232] text-white">
                 Clear
               </Button>
+            )}
+            {showFinishButton && (
               <Button
                 onClick={() => {
                   const encodedNodes = encodeURIComponent(JSON.stringify(nodes));
@@ -405,8 +409,8 @@ export default function Web3BlocksComponent() {
               >
                 Compile
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Canvas */}
