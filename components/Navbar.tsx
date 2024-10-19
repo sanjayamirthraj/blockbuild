@@ -27,7 +27,7 @@ export default function Navbar() {
 
                     <div className="flex items-center">
                         <NavItem icon={<Settings size={18} />} text="Settings" href="/settings" />
-                        <NavItem icon={<FolderKanban size={18} />} text="Projects" href="/projects" />
+                        <NavItem icon={<FolderKanban size={18} />} text="Projects" href="/home" />
                         <NavItem icon={<FolderKanban size={18} />} text="Files" href="/files" />
                         <NavItem icon={<FolderKanban size={18} />} text="Login Test" href="/login" />
                     </div>
