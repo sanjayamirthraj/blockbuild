@@ -10,7 +10,6 @@ export async function POST(req: NextRequest) {
     try {
         const filePath = 'test.sol'
         const source = fs.readFileSync(filePath, 'utf8');
-        const contractName = path.basename(filePath).split('.')[0];
         const input = {
             language: 'Solidity',
             sources: {
@@ -26,13 +25,13 @@ export async function POST(req: NextRequest) {
                 },
             },
         };
-
+        console.log("checking contractName", contractName)
         const output = JSON.parse(solc.compile(JSON.stringify(input)));
-        const bytecode = output.contracts[filePath][contractName].evm.bytecode.object;
+        const bytecode = output.contracts['test.sol'][contractName]?.evm.bytecode.object;
         console.log(bytecode);
-        const abi = output.contracts[filePath][contractName].abi;
+        const abi = output.contracts['test.sol'][contractName]?.abi;
         console.log(abi);
-        return new NextResponse(JSON.stringify({ message: "Contract compiled successfully" }));
+        return new NextResponse(JSON.stringify({ bytecode: bytecode, abi: abi }));
     } catch (error) {
         console.error(error);
         return new NextResponse(JSON.stringify({ error: "Contract deployment failed" }), { status: 500 });
