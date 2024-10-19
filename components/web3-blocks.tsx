@@ -38,6 +38,17 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import ReactFlow, { 
+  Background, 
+  Controls, 
+  MiniMap, 
+  addEdge, 
+  useNodesState, 
+  useEdgesState,
+  Node,
+  Edge
+} from 'reactflow';
+import 'reactflow/dist/style.css';
 
 // checkoint LMAOO
 
@@ -76,6 +87,8 @@ export default function Web3BlocksComponent() {
   const [hoveredBlock, setHoveredBlock] = useState(null)
   const [isCredenzaOpen, setIsCredenzaOpen] = useState(false)
   const [tutorialMode, setTutorialMode] = useState(false)
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -87,7 +100,13 @@ export default function Web3BlocksComponent() {
   })
 
   const addBlock = (block) => {
-    setPlacedBlocks(prevBlocks => [...prevBlocks, { ...block, uniqueId: Date.now().toString() }])
+    const newNode: Node = {
+      id: Date.now().toString(),
+      type: 'blockNode',
+      position: { x: 100, y: 100 + nodes.length * 100 },
+      data: { ...block, onNodeClick: handleNodeClick },
+    };
+    setNodes((nds) => [...nds, newNode]);
   }
 
   const removeBlock = (uniqueId) => {
@@ -165,6 +184,40 @@ export default function Web3BlocksComponent() {
     form.reset()
     toast.success('Custom block added!')
   }
+
+  const handleNodeClick = (nodeId: string) => {
+    const newNode: Node = {
+      id: `node-${Date.now()}`,
+      position: { x: 250, y: 250 },
+      data: { label: 'New Node' },
+    };
+    
+    setNodes((nds) => nds.concat(newNode));
+    
+    const newEdge: Edge = {
+      id: `edge-${nodeId}-${newNode.id}`,
+      source: nodeId,
+      target: newNode.id,
+    };
+    
+    setEdges((eds) => addEdge(newEdge, eds));
+  };
+
+  // Custom node component for blocks
+  const BlockNode = ({ data }) => (
+    <div
+      className={`${data.color} text-white p-6 shadow-md cursor-pointer select-none
+                  flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px]`}
+      onClick={() => data.onNodeClick(data.id)}
+    >
+      <span>{data.content}</span>
+      <data.icon className="w-4 h-4" />
+    </div>
+  );
+
+  const nodeTypes = {
+    blockNode: BlockNode,
+  };
 
   return (
     <div className="flex h-screen bg-[#141313] pt-8 selectable-none">
@@ -251,7 +304,7 @@ export default function Web3BlocksComponent() {
                 checked={tutorialMode}
                 onCheckedChange={setTutorialMode}
               />
-              <Label htmlFor="tutorial-mode" className="text-white">Off Tutorial Mode</Label>
+              <Label htmlFor="tutorial-mode" className="text-white">Toggle Hover</Label>
             </div>
           </div>
           {showFinishButton && (
@@ -270,50 +323,18 @@ export default function Web3BlocksComponent() {
 
 
         {/* Canvas */}
-        <div id="block-canvas" className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] overflow-y-auto bg-transparent">
-          <DotBackgroundDemo />
-          <Reorder.Group axis="y" values={placedBlocks} onReorder={setPlacedBlocks} className="flex flex-col -gap-[1px]">
-            <AnimatePresence>
-              {placedBlocks.map((block) => (
-                <Reorder.Item key={block.uniqueId} value={block} className="list-none">
-                  <ContextMenu>
-                    <ContextMenuTrigger>
-                      <motion.div
-                        layout
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className={`${block.color} text-white p-6 shadow-md cursor-pointer select-none
-                                    flex items-center justify-between border-[1px] ${block.borderColor} ${block.hoverBorderColor} group transition-colors w-full max-w-[400px] relative`}
-                        onMouseEnter={() => tutorialMode && setHoveredBlock(block.uniqueId)}
-                        onMouseLeave={() => tutorialMode && setHoveredBlock(null)}
-                        onClick={() => handleBlockClick(block)}
-                      >
-                        <span>{block.content}</span>
-                        <block.icon className="w-4 h-4" />
-                        <div className="hidden group-hover:flex absolute right-[-7px] top-1/2 transform -translate-y-1/2 w-3 h-6 bg-white rounded-full transition-all "/>
-                        {tutorialMode && hoveredBlock === block.uniqueId && (
-                          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg">
-                            <span className="text-white text-xs absolute top-2 left-2">Click to interact</span>
-                          </div>
-                        )}
-                      </motion.div>
-                    </ContextMenuTrigger>
-                    <ContextMenuContent>
-                      <ContextMenuItem onClick={() => handleCustomize(block.uniqueId)}>
-                        <Pen className="mr-2 h-4 w-4" />
-                        <span>Customize</span>
-                      </ContextMenuItem>
-                      <ContextMenuItem onClick={() => handleDelete(block.uniqueId)} className="text-red-600">
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        <span>Delete</span>
-                      </ContextMenuItem>
-                    </ContextMenuContent>
-                  </ContextMenu>
-                </Reorder.Item>
-              ))}
-            </AnimatePresence>
-          </Reorder.Group>
+        <div id="block-canvas" className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] overflow-hidden bg-transparent">
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            nodeTypes={nodeTypes}
+          >
+            <Background />
+            <Controls />
+            <MiniMap />
+          </ReactFlow>
         </div>
       </motion.div>
 
