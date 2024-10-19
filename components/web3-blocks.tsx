@@ -51,6 +51,7 @@ import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
 import CustomBlockModal from './CustomBlockModal'
 import SwapNode from './SwapNode'
+import StakeNode from './StakeNode'
 
 // Define the different block types with their properties
 const blockTypes = [
@@ -103,6 +104,7 @@ const BlockNode = ({ data, isDragging, id }) => {
 const nodeTypes = {
     blockNode: BlockNode,
     swapNode: SwapNode,
+    stakeNode: StakeNode,
 }
 
 // Main component for the DeFi Blocks builder
