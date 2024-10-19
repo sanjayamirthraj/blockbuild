@@ -36,6 +36,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
 // Define the block types with Web3/crypto content, colors, and icons
 const blockTypes = [
@@ -71,6 +73,7 @@ export default function Web3BlocksComponent() {
   const mouseY = useMotionValue(0)
   const [hoveredBlock, setHoveredBlock] = useState(null)
   const [isCredenzaOpen, setIsCredenzaOpen] = useState(false)
+  const [hoverEnabled, setHoverEnabled] = useState(true)
 
   // Initialize the form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -238,7 +241,17 @@ export default function Web3BlocksComponent() {
         transition={{ duration: 0.3 }}
       >
         <div className="flex justify-between items-center mt-4 mb-4">
-          <h2 className="text-2xl text-white ml-8 mt-1">Project Name</h2>
+          <div className="flex items-center gap-4 ml-8">
+            <h2 className="text-2xl text-white mt-1">Project Name</h2>
+            <div className="ml-7 mt-2 flex items-center space-x-2 justify-center">
+              <Switch
+                id="hover-mode"
+                checked={hoverEnabled}
+                onCheckedChange={setHoverEnabled}
+              />
+              <Label htmlFor="hover-mode" className="text-white">Tutorial Mode</Label>
+            </div>
+          </div>
           {showFinishButton && (
 
 
@@ -270,14 +283,14 @@ export default function Web3BlocksComponent() {
                         exit={{ opacity: 0, y: -20 }}
                         className={`${block.color} text-white p-6 shadow-md cursor-pointer select-none
                                     flex items-center justify-between border-[1px] ${block.borderColor} ${block.hoverBorderColor} group transition-colors w-full max-w-[400px] relative`}
-                        onMouseEnter={() => setHoveredBlock(block.uniqueId)}
-                        onMouseLeave={() => setHoveredBlock(null)}
+                        onMouseEnter={() => hoverEnabled && setHoveredBlock(block.uniqueId)}
+                        onMouseLeave={() => hoverEnabled && setHoveredBlock(null)}
                         onClick={() => handleBlockClick(block)}
                       >
                         <span>{block.content}</span>
                         <block.icon className="w-4 h-4" />
                         <div className="hidden group-hover:flex absolute right-[-7px] top-1/2 transform -translate-y-1/2 w-3 h-6 bg-white rounded-full transition-all "/>
-                        {hoveredBlock === block.uniqueId && (
+                        {hoverEnabled && hoveredBlock === block.uniqueId && (
                           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg">
                             <span className="text-white text-xs absolute top-2 left-2">Click to interact</span>
                           </div>
