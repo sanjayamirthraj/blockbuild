@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import '@rainbow-me/rainbowkit/styles.css'
+import { createConnector } from '@wagmi/core'
 
-const ContractDeployment: React.FC = () => {
+const ContractDeployment: React.FC<{ hash: `0x${string}` }> = ({ hash }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [contractCode, setContractCode] = useState<string>('');
   const contractAddress = "Click deploy to get your contract address";
@@ -12,7 +14,14 @@ const ContractDeployment: React.FC = () => {
     try {
       await navigator.clipboard.writeText(contractAddress);
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
+      let count = 0;
+      const interval = setInterval(() => {
+        if (count >= 50) {
+          clearInterval(interval);
+          setIsCopied(false);
+        }
+        count++;
+      }, 40); // 50 times in 2 seconds = 40ms interval
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }

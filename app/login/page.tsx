@@ -1,6 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import '@rainbow-me/rainbowkit/styles.css'
+
 
 export default function LoginPage() {
     return (
@@ -8,6 +11,8 @@ export default function LoginPage() {
             {/* Left side: Login form (to be added) */}
             <div className="w-1/3">
                 {/* Login form will go here */}
+                <ConnectButton />
+
                 <Button>
                     <Link href="/">Login</Link>
                 </Button>

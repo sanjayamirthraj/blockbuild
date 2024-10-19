@@ -27,9 +27,9 @@ export async function POST(req: NextRequest) {
         };
         console.log("checking contractName", contractName)
         const output = JSON.parse(solc.compile(JSON.stringify(input)));
-        const bytecode = output.contracts['test.sol'][contractName].evm.bytecode.object;
+        const bytecode = output.contracts['test.sol'][contractName]?.evm.bytecode.object;
         console.log(bytecode);
-        const abi = output.contracts['test.sol'][contractName].abi;
+        const abi = output.contracts['test.sol'][contractName]?.abi;
         console.log(abi);
         return new NextResponse(JSON.stringify({ bytecode: bytecode, abi: abi }));
     } catch (error) {

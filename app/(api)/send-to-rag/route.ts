@@ -42,7 +42,7 @@ async function generateAndFormatSolidityCode(message: string): Promise<string> {
     const code = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
-            { "role": "user", "content": "Develop a solidity code for a smart contract that is secure and efficient. The following is a json object that lists all the methods and their paramters. Only return the smart contract code. Do NOT make placeholder comments. CODE UP EVERYTHING Do not return anything else. This is the json object: " + message }
+            { "role": "user", "content": "Develop a solidity code for a smart contract that is secure and efficient. The following is a json object that lists all the methods and their paramters. Only return the smart contract code. Do NOT make placeholder comments. Make sure that the smart contract has preloaded arguments.CODE UP EVERYTHING Do not return anything else. This is the json object: " + message }
         ]
     });
     return formatSolidityCode(code.choices[0].message.content as string);
