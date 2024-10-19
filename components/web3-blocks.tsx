@@ -1,28 +1,17 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
-import { Wallet, ArrowRightLeft, Repeat, MessageSquare, DollarSign, Power, Trash2, Pen, ChevronRight, ChevronLeft, Plus } from 'lucide-react'
-import { motion, AnimatePresence, Reorder, useMotionValue, useTransform } from "framer-motion"
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu"
-import { DotBackgroundDemo } from "@/components/dot-background"
-import { toast } from 'sonner'
-import { Info } from 'lucide-react'
+import { Wallet, ArrowRightLeft, Repeat, MessageSquare, DollarSign, Power, ChevronRight, ChevronLeft, Plus, Info, Code } from 'lucide-react'
+import { motion } from "framer-motion"
 import {
   Credenza,
   CredenzaBody,
   CredenzaClose,
   CredenzaContent,
   CredenzaDescription,
-  CredenzaFooter,
   CredenzaHeader,
   CredenzaTitle,
-  CredenzaTrigger,
 } from "@/components/credeza"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -38,35 +27,31 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import ReactFlow, { 
-  Background, 
-  Controls, 
-  MiniMap, 
-  addEdge, 
-  useNodesState, 
+import ReactFlow, {
+  Background,
+  Controls,
+  MiniMap,
+  addEdge,
+  useNodesState,
   useEdgesState,
-  Node,
-  Edge
-} from 'reactflow';
-import 'reactflow/dist/style.css';
+  Handle,
+} from 'reactflow'
+import 'reactflow/dist/style.css'
+import { toast } from 'sonner'
 
-// checkoint LMAOO
-
-// Define the block types with Web3/crypto content, colors, and icons
 const blockTypes = [
   { id: 'start', content: 'Connect Wallet', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
   { id: 'swap', content: 'Swap Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: ArrowRightLeft },
   { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: Repeat },
   { id: 'governance', content: 'Vote on Proposal', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: MessageSquare },
   { id: 'stake', content: 'Stake Tokens', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', hoverBorderColor: 'hover:border-[#FB6A9E]', icon: DollarSign },
-  { id: 'stake', content: 'Allocate Tokens', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: DollarSign },
-  { id: 'end', content: 'Disconnect', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: Power },
+  { id: 'allocate', content: 'Allocate Tokens', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: DollarSign },
+  { id: 'end', content: 'Disconnect', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
 ]
 
-// Add this at the top of the file, after the blockTypes definition
 const groupedBlocks = {
   "Trigger Actions": blockTypes.filter(block => ['start', 'end'].includes(block.id)),
-  "Token Actions": blockTypes.filter(block => ['swap', 'stake'].includes(block.id)),
+  "Token Actions": blockTypes.filter(block => ['swap', 'stake', 'allocate'].includes(block.id)),
   "Liquidity": blockTypes.filter(block => block.id === 'liquidity'),
   "Governance": blockTypes.filter(block => block.id === 'governance'),
 }
@@ -78,20 +63,16 @@ const formSchema = z.object({
 })
 
 export default function Web3BlocksComponent() {
-  const [placedBlocks, setPlacedBlocks] = useState([])
   const [showFinishButton, setShowFinishButton] = useState(false)
   const [isOpen, setIsOpen] = useState(true)
-  const [draggedBlock, setDraggedBlock] = useState(null)
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-  const [hoveredBlock, setHoveredBlock] = useState(null)
   const [isCredenzaOpen, setIsCredenzaOpen] = useState(false)
   const [tutorialMode, setTutorialMode] = useState(false)
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [flowSummary, setFlowSummary] = useState([])
 
   // Initialize the form
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       blockName: "",
@@ -100,75 +81,49 @@ export default function Web3BlocksComponent() {
   })
 
   const addBlock = (block) => {
-    const newNode: Node = {
-      id: Date.now().toString(),
+    const newNodeId = Date.now().toString()
+    const newNode = {
+      id: newNodeId,
       type: 'blockNode',
       position: { x: 100, y: 100 + nodes.length * 100 },
-      data: { ...block, onNodeClick: handleNodeClick },
-    };
-    setNodes((nds) => [...nds, newNode]);
+      data: {
+        ...block,
+        onNodeClick: handleNodeClick,
+        uniqueId: newNodeId, // Add uniqueId to identify blocks
+      },
+    }
+    setNodes((nds) => [...nds, newNode])
   }
 
   const removeBlock = (uniqueId) => {
-    setPlacedBlocks(prevBlocks => prevBlocks.filter(block => block.uniqueId !== uniqueId))
+    setNodes((nds) => nds.filter((node) => node.id !== uniqueId))
+    setEdges((eds) => eds.filter((edge) => edge.source !== uniqueId && edge.target !== uniqueId))
+    setFlowSummary((prevSummary) => prevSummary.filter((item) => item.fromId !== uniqueId && item.toId !== uniqueId))
   }
 
   useEffect(() => {
-    const hasStart = placedBlocks.some(block => block.id === 'start')
-    const hasEnd = placedBlocks.some(block => block.id === 'end')
+    const hasStart = nodes.some(node => node.data.id === 'start')
+    const hasEnd = nodes.some(node => node.data.id === 'end')
     setShowFinishButton(hasStart && hasEnd)
-  }, [placedBlocks])
+  }, [nodes])
 
   const handleFinish = () => {
-    console.log("Finished! Transaction flow:", placedBlocks)
+    console.log("Finished! Transaction flow:", flowSummary)
     // Add your logic here for what should happen when the Finish button is clicked
   }
 
   const handleClear = () => {
-    setPlacedBlocks([])
+    setNodes([])
+    setEdges([])
+    setFlowSummary([])
     toast.success('Blocks cleared')
-  }
-
-  const handleDelete = (uniqueId) => {
-    removeBlock(uniqueId)
-  }
-
-  const handleCustomize = (uniqueId) => {
-    // Add your customize logic here
-    console.log("Customize block:", uniqueId)
-  }
-
-  const handleDragStart = (block) => {
-    setDraggedBlock(block)
-  }
-
-  const handleDragEnd = (event, info, block) => {
-    setDraggedBlock(null)
-    const canvasElement = document.getElementById('block-canvas')
-    if (canvasElement) {
-      const canvasRect = canvasElement.getBoundingClientRect()
-      if (
-        info.point.x >= canvasRect.left &&
-        info.point.x <= canvasRect.right &&
-        info.point.y >= canvasRect.top &&
-        info.point.y <= canvasRect.bottom
-      ) {
-        addBlock(block)
-      }
-    }
-  }
-
-  const handleBlockClick = (block) => {
-    toast.success(`Clicked on ${block.content}`, {
-      description: `This is a ${block.id} block`,
-    })
   }
 
   const handleAddCustomBlock = () => {
     setIsCredenzaOpen(true)
   }
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values) => {
     const newCustomBlock = {
       id: 'custom',
       content: values.blockName,
@@ -185,39 +140,61 @@ export default function Web3BlocksComponent() {
     toast.success('Custom block added!')
   }
 
-  const handleNodeClick = (nodeId: string) => {
-    const newNode: Node = {
-      id: `node-${Date.now()}`,
-      position: { x: 250, y: 250 },
-      data: { label: 'New Node' },
-    };
-    
-    setNodes((nds) => nds.concat(newNode));
-    
-    const newEdge: Edge = {
-      id: `edge-${nodeId}-${newNode.id}`,
-      source: nodeId,
-      target: newNode.id,
-    };
-    
-    setEdges((eds) => addEdge(newEdge, eds));
-  };
+  const handleNodeClick = (nodeId) => {
+    // Handle node click if needed
+    console.log("Node clicked:", nodeId)
+  }
+
+  // Handle edge creation
+  const handleConnect = (params) => {
+    setEdges((eds) => addEdge({ ...params, type: 'step' }, eds))
+    updateFlowSummary(params.source, params.target)
+  }
+
+  const updateFlowSummary = (sourceId, targetId) => {
+    const sourceNode = nodes.find((node) => node.id === sourceId)
+    const targetNode = nodes.find((node) => node.id === targetId)
+
+    setFlowSummary((prevSummary) => {
+      // Check if the connection already exists
+      const exists = prevSummary.some(
+        (item) => item.fromId === sourceId && item.toId === targetId
+      )
+      if (!exists) {
+        return [
+          ...prevSummary,
+          {
+            from: sourceNode.data.content,
+            to: targetNode.data.content,
+            fromId: sourceId,
+            toId: targetId,
+          },
+        ]
+      } else {
+        return prevSummary
+      }
+    })
+  }
 
   // Custom node component for blocks
-  const BlockNode = ({ data }) => (
+  const BlockNode = ({ data, isDragging }) => (
     <div
       className={`${data.color} text-white p-6 shadow-md cursor-pointer select-none
-                  flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px]`}
-      onClick={() => data.onNodeClick(data.id)}
+                  flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${
+        isDragging ? 'opacity-70' : ''
+      }`}
     >
+      {/* Add handles for connections */}
+      <Handle type="target" position="top" style={{ background: '#555' }} />
       <span>{data.content}</span>
       <data.icon className="w-4 h-4" />
+      <Handle type="source" position="bottom" style={{ background: '#555' }} />
     </div>
-  );
+  )
 
   const nodeTypes = {
     blockNode: BlockNode,
-  };
+  }
 
   return (
     <div className="flex h-screen bg-[#141313] pt-8 selectable-none">
@@ -239,7 +216,6 @@ export default function Web3BlocksComponent() {
           </div>
         </div>
 
-
         {/* tab bar */}
         <motion.div
           initial={false}
@@ -257,18 +233,15 @@ export default function Web3BlocksComponent() {
                   </h3>
                   <div className="flex flex-col gap-2">
                     {blocks.map((block) => (
-                      <motion.div
-                        key={block.id}
-                        drag
-                        dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                        onDragStart={() => handleDragStart(block)}
-                        onDragEnd={(event, info) => handleDragEnd(event, info, block)}
-                        className={`${block.color} text-white p-3 rounded-lg shadow-md cursor-move select-none
+                      <div
+                        key={block.id + block.content}
+                        onClick={() => addBlock(block)}
+                        className={`${block.color} text-white p-3 rounded-lg shadow-md cursor-pointer select-none
                                     flex items-center justify-between border-[1px] ${block.borderColor} ${block.hoverBorderColor} transition-colors`}
                       >
                         <span>{block.content}</span>
                         <block.icon className="w-5 h-5" />
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -309,7 +282,6 @@ export default function Web3BlocksComponent() {
           </div>
           {showFinishButton && (
 
-
             <div className="flex gap-2">
               <Button onClick={handleClear} className=" px-6 hover:bg-[#323232] text-white">
                 Clear
@@ -321,7 +293,6 @@ export default function Web3BlocksComponent() {
           )}
         </div>
 
-
         {/* Canvas */}
         <div id="block-canvas" className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] overflow-hidden bg-transparent">
           <ReactFlow
@@ -329,7 +300,9 @@ export default function Web3BlocksComponent() {
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
+            onConnect={handleConnect}
             nodeTypes={nodeTypes}
+            defaultEdgeOptions={{ type: 'step' }} // Set edge type to 'step' for square lines
           >
             <Background />
             <Controls />
@@ -345,34 +318,17 @@ export default function Web3BlocksComponent() {
       >
         <h2 className="text-2xl mt-4 mb-4 text-white">Flow Summary</h2>
         <div className="bg-[#1F1F1F] rounded-lg shadow-md p-4 border-2 border-[#2A2A2A]">
-          {placedBlocks.map((block, index) => (
-            <div key={block.uniqueId} className="mb-2 flex items-center">
+          {flowSummary.map((item, index) => (
+            <div key={index} className="mb-2 flex items-center">
               <span className="mr-2 text-[#FB118E]">{index + 1}.</span>
-              <block.icon className="w-4 h-4 mr-2 text-[#FB118E]" />
-              <span className="text-white">{block.content}</span>
+              <span className="text-white">
+                {item.from} &rarr; {item.to}
+              </span>
             </div>
           ))}
         </div>
       </motion.div>
 
-      {draggedBlock && (
-        <motion.div
-          className={`${draggedBlock.color} text-white p-3 rounded-lg shadow-md select-none
-                      flex items-center justify-between border-2 ${draggedBlock.borderColor} opacity-50`}
-          style={{
-            position: 'fixed',
-            pointerEvents: 'none',
-            left: 0,
-            top: 0,
-            width: '200px',
-            zIndex: 1000,
-          }}
-          animate={{ x: mouseX, y: mouseY }}
-        >
-          <span>{draggedBlock.content}</span>
-          <draggedBlock.icon className="w-5 h-5" />
-        </motion.div>
-      )}
       {/* modal add blocks */}
       <Credenza open={isCredenzaOpen} onOpenChange={setIsCredenzaOpen}>
         <CredenzaContent className='border-white/10'>
