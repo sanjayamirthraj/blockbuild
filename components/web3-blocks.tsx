@@ -39,7 +39,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 // Define the block types with Web3/crypto content, colors, and icons
 const blockTypes = [
-  { id: 'start', content: 'Connect Wallet', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', hoverBorderColor: 'hover:border-[#FB6A9E]', icon: Wallet },
+  { id: 'start', content: 'Connect Wallet', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
   { id: 'swap', content: 'Swap Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: ArrowRightLeft },
   { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: Repeat },
   { id: 'governance', content: 'Vote on Proposal', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: MessageSquare },
@@ -164,7 +164,7 @@ export default function Web3BlocksComponent() {
   return (
     <div className="flex h-screen bg-[#141313] pt-8 selectable-none">
       <div className="relative translate-y-[1px]">
-        
+
         <Button
           variant="outline"
           size="icon"
@@ -215,7 +215,7 @@ export default function Web3BlocksComponent() {
                   </div>
                 </div>
               ))}
-              
+
               {/* Custom Block button */}
               <div className="mt-16 w-full">
                 <Button
@@ -252,12 +252,12 @@ export default function Web3BlocksComponent() {
             </div>
           )}
         </div>
-        
+
 
         {/* Canvas */}
         <div id="block-canvas" className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] overflow-y-auto bg-transparent">
           <DotBackgroundDemo />
-          <Reorder.Group axis="y" values={placedBlocks} onReorder={setPlacedBlocks} className="flex flex-col gap-2">
+          <Reorder.Group axis="y" values={placedBlocks} onReorder={setPlacedBlocks} className="flex flex-col -gap-[1px]">
             <AnimatePresence>
               {placedBlocks.map((block) => (
                 <Reorder.Item key={block.uniqueId} value={block} className="list-none">
@@ -268,18 +268,18 @@ export default function Web3BlocksComponent() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className={`${block.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
-                                    flex items-center justify-between border-[1px] ${block.borderColor} ${block.hoverBorderColor} transition-colors w-full max-w-[400px] relative`}
+                        className={`${block.color} text-white p-6 shadow-md cursor-pointer select-none
+                                    flex items-center justify-between border-[1px] ${block.borderColor} ${block.hoverBorderColor} group transition-colors w-full max-w-[400px] relative`}
                         onMouseEnter={() => setHoveredBlock(block.uniqueId)}
                         onMouseLeave={() => setHoveredBlock(null)}
                         onClick={() => handleBlockClick(block)}
                       >
                         <span>{block.content}</span>
                         <block.icon className="w-4 h-4" />
-                        <div className="absolute right-[-7px] top-1/2 transform -translate-y-1/2 w-3 h-6 bg-white rounded-full"></div>
+                        <div className="hidden group-hover:flex absolute right-[-7px] top-1/2 transform -translate-y-1/2 w-3 h-6 bg-white rounded-full transition-all "/>
                         {hoveredBlock === block.uniqueId && (
-                          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-                            <span className="text-white">Click to interact</span>
+                          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center rounded-lg">
+                            <span className="text-white text-xs absolute top-2 left-2">Click to interact</span>
                           </div>
                         )}
                       </motion.div>
@@ -337,7 +337,7 @@ export default function Web3BlocksComponent() {
           <draggedBlock.icon className="w-5 h-5" />
         </motion.div>
       )}
-
+      {/* modal add blocks */}
       <Credenza open={isCredenzaOpen} onOpenChange={setIsCredenzaOpen}>
         <CredenzaContent className='border-white/10'>
           <CredenzaHeader>
