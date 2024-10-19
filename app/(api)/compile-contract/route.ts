@@ -5,11 +5,12 @@ import { ContractFactory, ethers } from 'ethers';
 var solc = require('solc');
 
 export async function POST(req: NextRequest) {
-    const { contractName } = await req.json();
+
+    const { contractName, filePath } = await req.json();
     try {
         const filePath = 'test.sol'
         const source = fs.readFileSync(filePath, 'utf8');
-
+        const contractName = path.basename(filePath).split('.')[0];
         const input = {
             language: 'Solidity',
             sources: {
@@ -27,8 +28,6 @@ export async function POST(req: NextRequest) {
         };
 
         const output = JSON.parse(solc.compile(JSON.stringify(input)));
-        //const contractName = path.basename(filePath).split('.')[0];
-        const contractName = 'SecureEfficientSwap';
         const bytecode = output.contracts[filePath][contractName].evm.bytecode.object;
         console.log(bytecode);
         const abi = output.contracts[filePath][contractName].abi;

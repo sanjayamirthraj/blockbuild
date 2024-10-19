@@ -1,10 +1,22 @@
 import { NextResponse, NextRequest } from "next/server";
 const { Web3 } = require("web3");
+import { useDeployContract } from 'wagmi'
+import { type DeployContractReturnType } from '@wagmi/core'
 
+function deployContractToRootstock(contractName: string, contractABI: any, contractBytecode: string, args: any) {
+    const { deployContract } = useDeployContract()
+    deployContract({
+        abi: contractABI,
+        args: args,
+        bytecode: `0x${contractBytecode}`,
+    })
+}
 
 export async function POST(req: NextRequest, res: NextResponse) {
-    //const { contractName, contractABI, contractBytecode, deploymentNetwork, signerPrivateKey, arguments } = await req.json();
+    const { contractName, contractABI, contractBytecode, deploymentNetwork, signerPrivateKey, args } = await req.json();
     const contractNameTest = "SecureEfficientSwap";
+    const { deployContract } = useDeployContract()
+
     const contractABITest = [
         {
             "inputs": [
@@ -79,6 +91,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
             console.log(`https://${network}.etherscan.io/tx/${txhash}`);
         });
     console.log(`Contract deployed at ${deployedContract.options.address}`);
-
-    return new NextResponse(JSON.stringify({ message: "Contract deployed" }), { status: 200 });
+    try {
+        const contractData = await deployContractToRootstock(contractName, contractABI, contractBytecode, args);
+        return new NextResponse(JSON.stringify({ message: "Contract deployed", data: contractData }), { status: 200 });
+    } catch (error) {
+        console.error(`Error deploying contract: ${error}`);
+        return new NextResponse(JSON.stringify({ message: "Error deploying contract" }), { status: 500 });
+    }
 }
+

@@ -10,10 +10,25 @@ const openai = new OpenAI({
 export async function POST(req: NextRequest, res: NextResponse) {
     const { message, name } = await req.json();
     try {
-        const message = `{"methods": [{"name": "swap", "parameters": [{"name": "coinA", "type": "address"}, {"name": "coinB", "type": "address"}]}], "structs": []}`
+        const message = "methods: [methods with name 'swap' and parameters: [parameter with name 'coinA' and type 'address', parameter with name 'coinB' and type 'address']], structs: []";
+        const options = {
+            method: 'POST',
+            headers: {
+                Authorization: 'Bearer sid-sk-rY7kT9_Mj1ELODrHNZ4d3111yuVnjlUl-GgjeVmVRMay',
+                'Content-Type': 'application/json'
+            },
+            body: `{"query":"You are a helpful coding AI assistant that has access to a highly advanced search engine that helps you find documents that contain information about the user. Your answers are concise, informative, and use the context provided by the document search. Develop a solidity code for a smart contract that is secure and efficient. The following is an object that lists all the methods and their parameters. Only return the smart contract code. Do not make placeholder comments. Implement all methods. Do not have comments in the code. Do not return anything else. This is the spec:${message},","limit":1}`
+
+        };
+        fetch('https://top-tier-wasserstein-distance.sid.ai/query', options)
+            .then(response => response.json())
+            .then(response => console.log(response))
+            .catch(err => console.error(err));
+
+
         const formattedCode = await generateAndFormatSolidityCode(message);
-        console.log(formattedCode);
-        fs.writeFileSync(`${name}.sol`, formattedCode);
+        // console.log(formattedCode);
+        fs.writeFileSync(`test.sol`, formattedCode);
         return new NextResponse(JSON.stringify({ message: "Solidity file created successfully" }));
     } catch (error) {
         return new NextResponse(JSON.stringify({ error: "send-to-rag is not working" }), { status: 500 });
