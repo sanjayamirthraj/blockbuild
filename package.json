@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@infinitywarg/slither-js": "^0.10.0",
     "@openzeppelin/contracts": "^5.1.0",
     "@pinecone-database/pinecone": "^3.0.3",
     "@radix-ui/react-context-menu": "^2.2.2",
@@ -25,11 +26,12 @@
     "openai": "^4.67.3",
     "react": "^18",
     "react-dom": "^18",
+    "slither-js": "^0.8.0",
     "solc": "^0.8.28",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "viem": "^2.21.29",
-    "wagmi": "^2.12.20",
+    "wagmi": "^0.0.0-canary-20241018050628",
     "web3": "^4.13.0"
   },
   "devDependencies": {
