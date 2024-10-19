@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
-import { Wallet, ArrowRightLeft, Repeat, MessageSquare, DollarSign, Power, ChevronRight, ChevronLeft, Plus, Info, Code } from 'lucide-react'
+import { Wallet, ArrowRightLeft, Repeat, MessageSquare, DollarSign, Power, ChevronRight, ChevronLeft, Plus, Info, Code, ArrowRight } from 'lucide-react'
 import { motion } from "framer-motion"
 import {
   Credenza,
@@ -35,9 +35,20 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   Handle,
+  useStore,
+  NodeToolbar,
+  Position,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+import { Trash2 } from 'lucide-react'
 
 const blockTypes = [
   { id: 'start', content: 'Connect Wallet', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
@@ -80,6 +91,35 @@ export default function Web3BlocksComponent() {
     },
   })
 
+  const handleDeleteNode = (nodeId) => {
+    setNodes((nds) => nds.filter((node) => node.id !== nodeId))
+    setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId))
+    setFlowSummary((prevSummary) => prevSummary.filter((item) => item.fromId !== nodeId && item.toId !== nodeId))
+  }
+
+  const handleAddNode = (sourceNodeId, block) => {
+    const newNodeId = Date.now().toString()
+    const sourceNode = nodes.find(node => node.id === sourceNodeId)
+    const newNode = {
+      id: newNodeId,
+      type: 'blockNode',
+      position: { x: sourceNode.position.x, y: sourceNode.position.y + 150 },
+      data: {
+        ...block,
+        onNodeClick: handleNodeClick,
+        uniqueId: newNodeId,
+        handleDeleteNode,
+        handleAddNode,
+      },
+    }
+    setNodes((nds) => [...nds, newNode])
+
+    const newEdge = { id: `edge-${sourceNodeId}-${newNodeId}`, source: sourceNodeId, target: newNodeId, type: 'step' }
+    setEdges((eds) => [...eds, newEdge])
+
+    updateFlowSummary(sourceNodeId, newNodeId)
+  }
+
   const addBlock = (block) => {
     const newNodeId = Date.now().toString()
     const newNode = {
@@ -89,16 +129,12 @@ export default function Web3BlocksComponent() {
       data: {
         ...block,
         onNodeClick: handleNodeClick,
-        uniqueId: newNodeId, // Add uniqueId to identify blocks
+        uniqueId: newNodeId,
+        handleDeleteNode,
+        handleAddNode,
       },
     }
     setNodes((nds) => [...nds, newNode])
-  }
-
-  const removeBlock = (uniqueId) => {
-    setNodes((nds) => nds.filter((node) => node.id !== uniqueId))
-    setEdges((eds) => eds.filter((edge) => edge.source !== uniqueId && edge.target !== uniqueId))
-    setFlowSummary((prevSummary) => prevSummary.filter((item) => item.fromId !== uniqueId && item.toId !== uniqueId))
   }
 
   useEffect(() => {
@@ -177,20 +213,57 @@ export default function Web3BlocksComponent() {
   }
 
   // Custom node component for blocks
-  const BlockNode = ({ data, isDragging }) => (
-    <div
-      className={`${data.color} text-white p-6 shadow-md cursor-pointer select-none
-                  flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${
-        isDragging ? 'opacity-70' : ''
-      }`}
-    >
-      {/* Add handles for connections */}
-      <Handle type="target" position="top" style={{ background: '#555' }} />
-      <span>{data.content}</span>
-      <data.icon className="w-4 h-4" />
-      <Handle type="source" position="bottom" style={{ background: '#555' }} />
-    </div>
-  )
+  const BlockNode = ({ data, isDragging, id }) => {
+    const edges = useStore((state) => state.edges)
+    const hasOutgoingEdges = edges.some(edge => edge.source === id)
+
+    return (
+      <div
+        className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
+                    flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${
+          isDragging ? 'opacity-70' : ''
+        } relative group`}
+      >
+        <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
+        <span>{data.content}</span>
+        <data.icon className="w-4 h-4" />
+        <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
+
+        {/* Delete button */}
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={() => data.handleDeleteNode(id)}
+          className="absolute -top-3 -right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+
+        {/* Hover actions for adding new blocks */}
+        {!hasOutgoingEdges && (
+          <div className="absolute top-full mt-2 left-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {blockTypes.map((block) => (
+                  <DropdownMenuItem
+                    key={block.id}
+                    onSelect={() => data.handleAddNode(id, block)}
+                  >
+                    {block.content}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   const nodeTypes = {
     blockNode: BlockNode,
