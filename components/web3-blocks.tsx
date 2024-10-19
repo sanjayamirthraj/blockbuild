@@ -9,13 +9,6 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
-
 // Third-party libraries
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -33,7 +26,6 @@ import {
   Plus,
   Info,
   Code,
-  Trash2,
 } from 'lucide-react'
 import ReactFlow, {
   Background,
@@ -89,7 +81,6 @@ export default function Web3BlocksComponent() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [flowSummary, setFlowSummary] = useState([])
   const router = useRouter()
-  const [toolbarVisibility, setToolbarVisibility] = useState({})
   const [showClearButton, setShowClearButton] = useState(false)
   const edgeReconnectSuccessful = useRef(true)
 
@@ -204,12 +195,6 @@ export default function Web3BlocksComponent() {
     console.log("Node clicked:", nodeId)
   }
 
-  // Function to handle connecting two nodes
-  const handleConnect = (params) => {
-    setEdges((eds) => addEdge({ ...params, type: 'step' }, eds))
-    updateFlowSummary(params.source, params.target)
-  }
-
   // Function to update the flow summary based on the connected nodes
   const updateFlowSummary = (sourceId, targetId) => {
     const sourceNode = nodes.find((node) => node.id === sourceId)
@@ -243,61 +228,17 @@ export default function Web3BlocksComponent() {
 
   // Custom node component for React Flow
   const BlockNode = ({ data, isDragging, id }) => {
-    const edges = useStore((state) => state.edges)
-    const hasOutgoingEdges = edges.some(edge => edge.source === id)
-
     return (
-      <>
-        {/* Toolbar with delete and add actions */}
-        <NodeToolbar
-          isVisible={toolbarVisibility[id]}
-          position={hasOutgoingEdges ? Position.Bottom : Position.Right}
-        >
-          <div className="flex space-x-2">
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => data.handleDeleteNode(id)}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-
-            {!hasOutgoingEdges && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {blockTypes.map((block) => (
-                    <DropdownMenuItem
-                      key={block.id}
-                      onSelect={() => data.handleAddNode(id, block)}
-                    >
-                      {block.content}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </NodeToolbar>
-
-        {/* Block node representation */}
-        <div
-          className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
-                      flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''
-            } relative`}
-          onMouseEnter={() => setToolbarVisibility(prev => ({ ...prev, [id]: true }))}
-          onMouseLeave={() => setToolbarVisibility(prev => ({ ...prev, [id]: false }))}
-        >
-          <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
-          <span>{data.content}</span>
-          <data.icon className="w-4 h-4" />
-          <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
-        </div>
-      </>
+      <div
+        className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
+                    flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''
+          } relative`}
+      >
+        <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
+        <span>{data.content}</span>
+        <data.icon className="w-4 h-4" />
+        <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
+      </div>
     )
   }
 
