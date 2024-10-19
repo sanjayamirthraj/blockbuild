@@ -104,6 +104,7 @@ export default function Web3BlocksComponent() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [flowSummary, setFlowSummary] = useState([])
   const router = useRouter()
+  const [toolbarVisibility, setToolbarVisibility] = useState({})
 
   // Initialize the form
   const form = useForm({
@@ -135,9 +136,6 @@ export default function Web3BlocksComponent() {
         uniqueId: newNodeId,
         handleDeleteNode,
         handleAddNode,
-        toolbarVisible: false,
-        setToolbarVisible: (visible) =>
-          setToolbarVisible(prev => ({ ...prev, [newNodeId]: visible })),
       },
     }
     setNodes((nds) => [...nds, newNode])
@@ -161,9 +159,6 @@ export default function Web3BlocksComponent() {
         uniqueId: newNodeId,
         handleDeleteNode,
         handleAddNode,
-        toolbarVisible: false,
-        setToolbarVisible: (visible) =>
-          setToolbarVisible(prev => ({ ...prev, [newNodeId]: visible })),
       },
     }
     setNodes((nds) => [...nds, newNode])
@@ -264,7 +259,7 @@ export default function Web3BlocksComponent() {
       <>
         {/* Toolbar with delete and add actions */}
         <NodeToolbar
-          isVisible={data.toolbarVisible}
+          isVisible={toolbarVisibility[id]}
           position={hasOutgoingEdges ? Position.Bottom : Position.Right}
         >
           <div className="flex space-x-2">
@@ -303,8 +298,8 @@ export default function Web3BlocksComponent() {
           className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
                       flex items-center justify-between border-[1px] ${data.borderColor} ${data.hoverBorderColor} transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''
             } relative`}
-          onMouseEnter={() => data.setToolbarVisible(true)}
-          onMouseLeave={() => data.setToolbarVisible(false)}
+          onMouseEnter={() => setToolbarVisibility(prev => ({ ...prev, [id]: true }))}
+          onMouseLeave={() => setToolbarVisibility(prev => ({ ...prev, [id]: false }))}
         >
           <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
           <span>{data.content}</span>
