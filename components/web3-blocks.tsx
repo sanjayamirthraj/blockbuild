@@ -1,7 +1,7 @@
 "use client"
 
 // React and Next.js imports
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
 // UI components and utilities
@@ -46,6 +46,7 @@ import ReactFlow, {
   useStore,
   NodeToolbar,
   Position,
+  reconnectEdge,
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
@@ -90,6 +91,7 @@ export default function Web3BlocksComponent() {
   const router = useRouter()
   const [toolbarVisibility, setToolbarVisibility] = useState({})
   const [showClearButton, setShowClearButton] = useState(false)
+  const edgeReconnectSuccessful = useRef(true)
 
   // Initialize the form
   const form = useForm({
@@ -304,6 +306,41 @@ export default function Web3BlocksComponent() {
     blockNode: BlockNode,
   }
 
+  const onConnect = useCallback(
+    (params) => {
+      setEdges((els) => addEdge(params, els));
+      updateFlowSummary(params.source, params.target);
+    },
+    [updateFlowSummary]
+  );
+
+  const onReconnectStart = useCallback(() => {
+    edgeReconnectSuccessful.current = false;
+  }, []);
+
+  const onReconnect = useCallback((oldEdge, newConnection) => {
+    edgeReconnectSuccessful.current = true;
+    setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+    updateFlowSummary(newConnection.source, newConnection.target);
+  }, [updateFlowSummary]);
+
+  const onReconnectEnd = useCallback((_, edge) => {
+    if (!edgeReconnectSuccessful.current) {
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+      // Remove the connection from the flow summary
+      setFlowSummary((prevSummary) => {
+        const sourceIndex = prevSummary.findIndex(item => item.id === edge.source);
+        const targetIndex = prevSummary.findIndex(item => item.id === edge.target);
+        if (sourceIndex !== -1 && targetIndex !== -1) {
+          return prevSummary.slice(0, targetIndex);
+        }
+        return prevSummary;
+      });
+    }
+
+    edgeReconnectSuccessful.current = true;
+  }, []);
+
   return (
     <div className="flex h-screen bg-[#141313] pt-8 selectable-none">
       {/* Sidebar */}
@@ -420,7 +457,10 @@ export default function Web3BlocksComponent() {
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
-            onConnect={handleConnect}
+            onConnect={onConnect}
+            onReconnect={onReconnect}
+            onReconnectStart={onReconnectStart}
+            onReconnectEnd={onReconnectEnd}
             nodeTypes={nodeTypes}
             defaultEdgeOptions={{ type: 'step' }}
             snapToGrid={true}
