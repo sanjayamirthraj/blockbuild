@@ -86,10 +86,13 @@ const BlockNode = ({ data, isDragging, id }) => {
     if (data.id === 'swap') {
         return <SwapNode data={data} isConnectable={true} />;
     }
+    if (data.id === 'stake') {
+        return <StakeNode data={data} isConnectable={true} />;
+    }
     return (
         <div
             className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
-                flex items-center justify-between border-2 transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''}
+                flex items-center justify-between border-[1px] transition-colors w-[200px] ${isDragging ? 'opacity-70' : ''}
                 ${isSelected ? 'border-white shadow-glow' : data.borderColor} ${isSelected ? '' : data.hoverBorderColor} relative`}
         >
             {id !== 'start' && <Handle type="target" position={Position.Top} style={{ background: '#555' }} />}
@@ -169,7 +172,7 @@ function Web3BlocksComponent() {
         const newNodeId = Date.now().toString()
         const newNode = {
             id: newNodeId,
-            type: 'blockNode',
+            type: block.id === 'stake' ? 'stakeNode' : 'blockNode',
             position: { x: 100, y: 100 + nodes.length * 100 },
             data: {
                 ...block,

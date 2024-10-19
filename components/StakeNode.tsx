@@ -2,20 +2,33 @@ import React, { useState, useCallback } from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Landmark, Plus } from 'lucide-react'
+import { Landmark, Plus, Minus } from 'lucide-react'
 
 const tokens = ['ETH', 'USDT', 'BTC', 'DAI', 'LINK']
 
 const StakeNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
-    const [selectedToken, setSelectedToken] = useState(tokens[0])
-    const [amount, setAmount] = useState('')
+    const [tokenInputs, setTokenInputs] = useState([
+        { token: tokens[0], amount: '' }
+    ])
 
-    const onTokenChange = useCallback((value: string) => {
-        setSelectedToken(value)
+    const addTokenInput = useCallback(() => {
+        setTokenInputs(prev => [...prev, { token: tokens[0], amount: '' }])
     }, [])
 
-    const onAmountChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setAmount(event.target.value)
+    const removeTokenInput = useCallback((index: number) => {
+        setTokenInputs(prev => prev.filter((_, i) => i !== index))
+    }, [])
+
+    const onTokenChange = useCallback((value: string, index: number) => {
+        setTokenInputs(prev => prev.map((item, i) => 
+            i === index ? { ...item, token: value } : item
+        ))
+    }, [])
+
+    const onAmountChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        setTokenInputs(prev => prev.map((item, i) => 
+            i === index ? { ...item, amount: event.target.value } : item
+        ))
     }, [])
 
     return (
@@ -24,30 +37,45 @@ const StakeNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
                 <span>Stake Tokens</span>
                 <Landmark className="w-4 h-4" />
             </div>
+
             <div className="flex flex-col space-y-2" onClick={(e) => e.stopPropagation()}>
-                <Select onValueChange={onTokenChange} value={selectedToken}>
-                    <SelectTrigger className="w-full bg-[#251A2A] border-[1px] border-[#663B6A]">
-                        <SelectValue placeholder="Select Token" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {tokens.map((token) => (
-                            <SelectItem key={token} value={token}>
-                                {token}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <div className="flex items-center space-x-2">
-                    <Input
-                        type="number"
-                        placeholder="Amount"
-                        value={amount}
-                        onChange={onAmountChange}
-                        className="bg-[#251A2A] border-[1px] border-[#663B6A]"
-                    />
-                    <Plus className="w-4 h-4 cursor-pointer hover:text-[#FB6A9E]" />
-                </div>
+                {tokenInputs.map((input, index) => (
+                    <div key={index} className="flex flex-col space-y-2">
+                        <div className="flex items-center space-x-2">
+                            <Select onValueChange={(value) => onTokenChange(value, index)} value={input.token}>
+                                <SelectTrigger className="w-full bg-[#3f2c48] border-[1px] border-[#663B6A]">
+                                    <SelectValue placeholder="Select Token" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {tokens.map((token) => (
+                                        <SelectItem key={token} value={token}>
+                                            {token}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Input
+                                type="number"
+                                placeholder="Amount"
+                                value={input.amount}
+                                onChange={(e) => onAmountChange(e, index)}
+                                className="bg-[#3f2c48] border-[1px] border-[#663B6A]"
+                            />
+                            {index > 0 && (
+                                <Minus 
+                                    onClick={() => removeTokenInput(index)} 
+                                    className="w-4 h-4 cursor-pointer hover:text-[#FB6A9E]" 
+                                />
+                            )}
+                        </div>
+                    </div>
+                ))}
+                <Plus 
+                    onClick={addTokenInput} 
+                    className="w-4 h-4 cursor-pointer hover:text-[#FB6A9E] self-center" 
+                />
             </div>
+
             <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
             <Handle type="source" position={Position.Bottom} isConnectable={isConnectable} />
         </div>
