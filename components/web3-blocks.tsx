@@ -50,6 +50,7 @@ import {
 } from "@/components/ui/context-menu"
 import { Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 const blockTypes = [
   { id: 'start', content: 'Connect Wallet', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
@@ -83,6 +84,7 @@ export default function Web3BlocksComponent() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [flowSummary, setFlowSummary] = useState([])
   const [toolbarVisible, setToolbarVisible] = useState({})
+  const router = useRouter()
 
   // Initialize the form
   const form = useForm({
@@ -375,13 +377,16 @@ export default function Web3BlocksComponent() {
           {showFinishButton && (
 
             <div className="flex gap-2">
-              <Button onClick={handleClear} className=" px-6 hover:bg-[#323232] text-white">
+              <Button onClick={handleClear} className="px-6 hover:bg-[#323232] text-white">
                 Clear
               </Button>
-              <Button onClick={handleFinish} className="bg-[#322131] hover:bg-[#21173E] text-white">
-                <Link href="/compile">
-                  Compile
-                </Link>
+              <Button onClick={() => {
+                const encodedNodes = encodeURIComponent(JSON.stringify(nodes));
+                const encodedEdges = encodeURIComponent(JSON.stringify(edges));
+                const encodedFlowSummary = encodeURIComponent(JSON.stringify(flowSummary));
+                router.push(`/compile?nodes=${encodedNodes}&edges=${encodedEdges}&flowSummary=${encodedFlowSummary}`);
+              }} className="bg-[#322131] hover:bg-[#21173E] text-white">
+                Compile
               </Button>
             </div>
           )}
