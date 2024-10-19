@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { Button } from "@/components/ui/button"
-import { Wallet, ArrowRightLeft, Repeat, MessageSquare, DollarSign, Power, Trash2, Pen, ChevronRight, ChevronLeft } from 'lucide-react'
+import { Wallet, ArrowRightLeft, Repeat, MessageSquare, DollarSign, Power, Trash2, Pen, ChevronRight, ChevronLeft, Plus } from 'lucide-react'
 import { motion, AnimatePresence, Reorder, useMotionValue, useTransform } from "framer-motion"
 import {
   ContextMenu,
@@ -13,16 +13,39 @@ import {
 import { DotBackgroundDemo } from "@/components/dot-background"
 import { toast } from 'sonner'
 import { Info } from 'lucide-react'
+import {
+  Credenza,
+  CredenzaBody,
+  CredenzaClose,
+  CredenzaContent,
+  CredenzaDescription,
+  CredenzaFooter,
+  CredenzaHeader,
+  CredenzaTitle,
+  CredenzaTrigger,
+} from "@/components/credeza"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Textarea } from "@/components/ui/textarea"
 
 // Define the block types with Web3/crypto content, colors, and icons
 const blockTypes = [
-  { id: 'start', content: 'Connect Wallet', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', icon: Wallet },
-  { id: 'swap', content: 'Swap Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', icon: ArrowRightLeft },
-  { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', icon: Repeat },
-  { id: 'governance', content: 'Vote on Proposal', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', icon: MessageSquare },
-  { id: 'stake', content: 'Stake Tokens', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', icon: DollarSign },
-  { id: 'stake', content: 'Allocate Tokens', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', icon: DollarSign },
-  { id: 'end', content: 'Disconnect', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', icon: Power },
+  { id: 'start', content: 'Connect Wallet', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', hoverBorderColor: 'hover:border-[#FB6A9E]', icon: Wallet },
+  { id: 'swap', content: 'Swap Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: ArrowRightLeft },
+  { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: Repeat },
+  { id: 'governance', content: 'Vote on Proposal', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: MessageSquare },
+  { id: 'stake', content: 'Stake Tokens', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', hoverBorderColor: 'hover:border-[#FB6A9E]', icon: DollarSign },
+  { id: 'stake', content: 'Allocate Tokens', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: DollarSign },
+  { id: 'end', content: 'Disconnect', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: Power },
 ]
 
 // Add this at the top of the file, after the blockTypes definition
@@ -33,6 +56,12 @@ const groupedBlocks = {
   "Governance": blockTypes.filter(block => block.id === 'governance'),
 }
 
+// Define the form schema
+const formSchema = z.object({
+  blockName: z.string().min(1, "Block name is required"),
+  solidityCode: z.string().min(1, "Solidity code is required"),
+})
+
 export default function Web3BlocksComponent() {
   const [placedBlocks, setPlacedBlocks] = useState([])
   const [showFinishButton, setShowFinishButton] = useState(false)
@@ -41,6 +70,16 @@ export default function Web3BlocksComponent() {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
   const [hoveredBlock, setHoveredBlock] = useState(null)
+  const [isCredenzaOpen, setIsCredenzaOpen] = useState(false)
+
+  // Initialize the form
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      blockName: "",
+      solidityCode: "",
+    },
+  })
 
   const addBlock = (block) => {
     setPlacedBlocks(prevBlocks => [...prevBlocks, { ...block, uniqueId: Date.now().toString() }])
@@ -101,9 +140,31 @@ export default function Web3BlocksComponent() {
     })
   }
 
+  const handleAddCustomBlock = () => {
+    setIsCredenzaOpen(true)
+  }
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    const newCustomBlock = {
+      id: 'custom',
+      content: values.blockName,
+      color: 'bg-[#3C3C3C]',
+      borderColor: 'border-[#6C6C6C]',
+      hoverBorderColor: 'hover:border-[#9C9C9C]',
+      icon: Code,
+      code: values.solidityCode,
+    }
+
+    addBlock(newCustomBlock)
+    setIsCredenzaOpen(false)
+    form.reset()
+    toast.success('Custom block added!')
+  }
+
   return (
     <div className="flex h-screen bg-[#141313] pt-8 selectable-none">
       <div className="relative translate-y-[1px]">
+        
         <Button
           variant="outline"
           size="icon"
@@ -112,12 +173,16 @@ export default function Web3BlocksComponent() {
         >
           {isOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </Button>
+
         <div className="absolute right-4 top-4 w-10 h-10 flex items-center justify-center cursor-pointer group">
           <Info className="size-8 text-white/60 group-hover:shadow-lg transition-shadow duration-300" />
           <div className="absolute hidden group-hover:block bg-gray-800 text-white/60 text-xs rounded-md p-2 -top-10 right-0">
             Information about the blocks
           </div>
         </div>
+
+
+        {/* tab bar */}
         <motion.div
           initial={false}
           animate={{ width: isOpen ? "18.4rem" : "0rem" }}
@@ -141,7 +206,7 @@ export default function Web3BlocksComponent() {
                         onDragStart={() => handleDragStart(block)}
                         onDragEnd={(event, info) => handleDragEnd(event, info, block)}
                         className={`${block.color} text-white p-3 rounded-lg shadow-md cursor-move select-none
-                                    flex items-center justify-between border-[1px] ${block.borderColor} hover:border-[#FB118E] transition-colors`}
+                                    flex items-center justify-between border-[1px] ${block.borderColor} ${block.hoverBorderColor} transition-colors`}
                       >
                         <span>{block.content}</span>
                         <block.icon className="w-5 h-5" />
@@ -150,9 +215,21 @@ export default function Web3BlocksComponent() {
                   </div>
                 </div>
               ))}
+              
+              {/* Custom Block button */}
+              <div className="mt-16 w-full">
+                <Button
+                  onClick={handleAddCustomBlock}
+                  className="bg-white text-black w-full"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Custom Block
+                </Button>
+              </div>
             </div>
           </div>
         </motion.div>
+
       </div>
 
       <motion.div
@@ -176,7 +253,9 @@ export default function Web3BlocksComponent() {
           )}
         </div>
         
-        <div id="block-canvas" className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] overflow-y-auto">
+
+        {/* Canvas */}
+        <div id="block-canvas" className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] overflow-y-auto bg-transparent">
           <DotBackgroundDemo />
           <Reorder.Group axis="y" values={placedBlocks} onReorder={setPlacedBlocks} className="flex flex-col gap-2">
             <AnimatePresence>
@@ -190,7 +269,7 @@ export default function Web3BlocksComponent() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         className={`${block.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
-                                    flex items-center justify-between border-[1px] ${block.borderColor} hover:border-[#FB118E] transition-colors w-full max-w-[400px] relative`}
+                                    flex items-center justify-between border-[1px] ${block.borderColor} ${block.hoverBorderColor} transition-colors w-full max-w-[400px] relative`}
                         onMouseEnter={() => setHoveredBlock(block.uniqueId)}
                         onMouseLeave={() => setHoveredBlock(null)}
                         onClick={() => handleBlockClick(block)}
@@ -258,6 +337,62 @@ export default function Web3BlocksComponent() {
           <draggedBlock.icon className="w-5 h-5" />
         </motion.div>
       )}
+
+      <Credenza open={isCredenzaOpen} onOpenChange={setIsCredenzaOpen}>
+        <CredenzaContent className='border-white/10'>
+          <CredenzaHeader>
+            <CredenzaTitle className="text-white">Add a Custom Block</CredenzaTitle>
+            <CredenzaDescription className="text-white/80">
+              Enter your Solidity code below to create a custom block.
+            </CredenzaDescription>
+          </CredenzaHeader>
+          <CredenzaBody>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="blockName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white">Block Name</FormLabel>
+                      <FormControl>
+                        <input
+                          {...field}
+                          className="w-full p-2 rounded bg-[#1F1F1F] text-white border border-[#2A2A2A] focus:border-[#4A4A4A]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="solidityCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-white">Solidity Code</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          placeholder="Enter your Solidity code here..."
+                          className="font-mono h-40 bg-[#1F1F1F] text-white border-[#2A2A2A] focus:border-[#4A4A4A]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end space-x-2">
+                  <CredenzaClose asChild>
+                    <Button variant="secondary" type="button">Cancel</Button>
+                  </CredenzaClose>
+                  <Button type="submit">Create Block</Button>
+                </div>
+              </form>
+            </Form>
+          </CredenzaBody>
+        </CredenzaContent>
+      </Credenza>
     </div>
   )
 }

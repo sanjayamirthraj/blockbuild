@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster, toast } from 'sonner'
-
+import { Toaster } from 'sonner'
 
 const interTight = Inter_Tight({
   subsets: ['latin'],
@@ -32,7 +31,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <div vaul-drawer-wrapper="" className="bg-background">
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>
