@@ -9,8 +9,7 @@ import ContractCode from './ContractCode';
 import { Button } from '@/components/ui/button';
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
-import { BlocksIcon } from 'lucide-react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Blocks as BlocksIcon } from 'lucide-react';
 
 const CompilePage: React.FC = () => {
     const searchParams = useSearchParams();
@@ -29,6 +28,15 @@ const CompilePage: React.FC = () => {
         }
     }, [searchParams]);
 
+    const handleCompile = () => {
+        const flowSummaryJSON = {
+            nodes: nodes,
+            edges: edges,
+            summary: flowSummary
+        };
+        console.log('Flow Summary JSON:', JSON.stringify(flowSummaryJSON, null, 2));
+    };
+
     return (
         <div className="flex flex-col min-h-screen text-white">
             <Navbar />
@@ -45,8 +53,11 @@ const CompilePage: React.FC = () => {
                             <ArrowLeft className="w-4 h-4 mr-1 translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out" />
                             Back
                         </Button>
-
-                        <Button variant="ghost" className="ml-4 mb-4 group text-white/50 hover:text-white hover:bg-white/5">
+                        <Button 
+                            variant="ghost" 
+                            className="ml-4 mb-4 group text-white/50 hover:text-white hover:bg-white/5"
+                            onClick={handleCompile}
+                        >
                             <BlocksIcon className="w-4 h-4 mr-1 translate-x-1 group-hover:translate-x-0 transition-transform duration-300 ease-in-out" />
                             Compile
                         </Button>
