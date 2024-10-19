@@ -11,6 +11,11 @@ import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/Navbar";
 import { ArrowLeft, Blocks as BlocksIcon } from 'lucide-react';
 
+//todo
+// make the contract page actaully work better
+// make custom node with editable parameters
+// make the flow graph more interactive
+
 const CompilePage: React.FC = () => {
     const searchParams = useSearchParams();
     const [nodes, setNodes] = useState([]);
