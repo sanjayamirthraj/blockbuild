@@ -39,6 +39,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 
+// checkoint LMAOO
+
 // Define the block types with Web3/crypto content, colors, and icons
 const blockTypes = [
   { id: 'start', content: 'Connect Wallet', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
