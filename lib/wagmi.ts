@@ -3,25 +3,25 @@ import { rootstockTestnet } from 'wagmi/chains'
 import { metaMask } from "wagmi/connectors";
 import { type Chain } from 'viem'
 
-export const xrplEvmSidechainDevnet = {
-    id: 1440002,
-    name: 'XRPL EVM Sidechain',
-    nativeCurrency: { name: 'XRP', symbol: 'XRP', decimals: 6 },
-    rpcUrls: {
-        default: { http: ['https://rpc-evm-sidechain.xrpl.org'] },
-    },
-    blockExplorers: {
-        default: { name: 'XRPL EVM Explorer', url: 'https://explorer.xrplevm.org' },
-    },
-    contracts: {
-    },
-} as const satisfies Chain
+// export const xrplEvmSidechainDevnet = {
+//     id: 1440002,
+//     name: 'XRPL EVM Sidechain',
+//     nativeCurrency: { name: 'XRP', symbol: 'XRP', decimals: 6 },
+//     rpcUrls: {
+//         default: { http: ['https://rpc-evm-sidechain.xrpl.org'] },
+//     },
+//     blockExplorers: {
+//         default: { name: 'XRPL EVM Explorer', url: 'https://explorer.xrplevm.org' },
+//     },
+//     contracts: {
+//     },
+// } as const satisfies Chain
 
 export const config = createConfig({
-    chains: [xrplEvmSidechainDevnet],
+    chains: [rootstockTestnet],
     connectors: [metaMask()],
     transports: {
-        [xrplEvmSidechainDevnet.id]: http(),
+        [rootstockTestnet.id]: http(),
     },
 })
 
