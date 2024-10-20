@@ -5,7 +5,7 @@ import { type Chain } from 'viem'
 
 export const xrplEvmSidechainDevnet = {
     id: 1440002,
-    name: 'XRPL EVM Sidechain Devnet',
+    name: 'XRPL EVM Sidechain',
     nativeCurrency: { name: 'XRP', symbol: 'XRP', decimals: 6 },
     rpcUrls: {
         default: { http: ['https://rpc-evm-sidechain.xrpl.org'] },
