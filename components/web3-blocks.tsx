@@ -477,7 +477,7 @@ function Web3BlocksComponent() {
           </div>
 
           {/* Custom Block button */}
-          <div className="p-6 w-72">
+          <div className="pb-12 p-6 w-72">
             <Button
               onClick={handleAddCustomBlock}
               className="bg-white text-black w-full"
