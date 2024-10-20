@@ -126,11 +126,11 @@ const CompilePage: React.FC = () => {
                         </Button>
                         {apiResponse && (
                             <div className="mt-4 ml-4">
-                                <h3 className="text-md font-semibold mb-2">Compilation Result:</h3>
-                                <div className="bg-[#1F1F1F] rounded-lg p-4 overflow-x-auto">
-                                    <pre className="text-sm font-mono text-white/80 whitespace-pre-wrap">
+                                <h3 className="text-lg font-normal mb-2">Compilation Result:</h3>
+                                <div className="bg-[#1F1F1F] border-[1px] border-white/10 p-4 overflow-x-auto">
+                                    <div className="text-sm font-mono text-white/80 whitespace-pre-wrap">
                                         {JSON.stringify(apiResponse, null, 2)}
-                                    </pre>
+                                    </div>
                                 </div>
                             </div>
                         )}
