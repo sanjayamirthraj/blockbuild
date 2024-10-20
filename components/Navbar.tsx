@@ -3,6 +3,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Settings, FolderKanban, FileText, GraduationCap, Bug } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 
 export default function Navbar() {
@@ -17,11 +18,13 @@ export default function Navbar() {
     return (
         <nav className="fixed w-full bg-[#141313] text-white border-b border-[#555555]">
             <div className="px-10 mx-auto flex items-center justify-between">
+
                 <div className="flex flex-row space-x-4 ">
+
                     <div className="flex items-center space-x-4 flex-grow mr-12">
                         <div className="flex items-center space-x-2 mr-1">
-                            <div className="w-6 h-6 bg-purple-500 rounded-full"></div>
-                            <span className="font-bold">WTV PROTOCOL</span>
+                            <Image src="/rootstock.png" alt="Rootstock Logo" className="w-5 h-5 inline-block mr-2" width={20} height={20}/>
+                            <span className="font-medium text-yellow-600">Rootstock</span>
                         </div>
                         <span className="text-gray-500">×</span>
                         <span className="text-gray-300">Building Blocks</span>
