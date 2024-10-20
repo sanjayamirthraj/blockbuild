@@ -23,8 +23,7 @@ export default function Navbar() {
 
                     <div className="flex items-center space-x-4 flex-grow mr-12">
                         <div className="flex items-center space-x-2 mr-1">
-                            <Image src="/rootstock.png" alt="Rootstock Logo" className="w-5 h-5 inline-block mr-2" width={20} height={20}/>
-                            <span className="font-medium text-yellow-600">Rootstock</span>
+                            <Image src="/XRPLLogo.svg" alt="XRPL Logo" className="w-5 h-5 inline-block mr-2" width={20} height={20}/>
                         </div>
                         <span className="text-gray-500">×</span>
                         <span className="text-gray-300">Building Blocks</span>

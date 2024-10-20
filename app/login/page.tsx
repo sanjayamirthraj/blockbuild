@@ -6,13 +6,13 @@ import '@rainbow-me/rainbowkit/styles.css'
 
 export default function LoginPage() {
     return (
-        <div className="min-h-screen flex items-center justify-between p-20">
-            <div className="w-full relative flex">
+        <div className=" flex items-center justify-between p-20">
+            <div className="w-full relative flex mt-20">
 
-                <div className="w-1/3 relative h-screen justify-center items-center ml-40 mt-52">
+                <div className="w-1/3 relative justify-center items-center ml-40 mt-40">
                     <Link href="/home">
                         <Image
-                            src="/login.svg"
+                            src="/XRPLAuth.svg"
                             alt="Login Illustration"
                             priority
                             className="draggable-none pointer-events-none"
@@ -26,12 +26,12 @@ export default function LoginPage() {
                 {/* Pattern SVG */}
                 <div className="w-2/3 relative ml-56">
                     <Image
-                        src="/pattern.svg"
-                        alt="Auth Background Pattern"
+                        src="/XRPL.svg"
+                        alt="XRPL Background Pattern"
                         priority
                         className="draggable-none pointer-events-none"
-                        width={1100}
-                        height={1100}
+                        width={1500}
+                        height={1500}
                     />
                 </div>
             </div>
