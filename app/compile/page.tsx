@@ -203,7 +203,7 @@ const CompilePage: React.FC = () => {
                                 bytecode: bytcodes,
                                 args: [10], 
                         });
-                        console.log(result)
+
                         setHash(result as `0x${string}`);
                     }}
                 >
@@ -211,6 +211,15 @@ const CompilePage: React.FC = () => {
                     Deploy Contract
                 </Button>
             </div>
+
+            {/* New div to display hash information */}
+            {hash && (
+                <div className="fixed bottom-16 right-4 bg-gray-800 p-4 rounded-lg shadow-lg">
+                    <h3 className="text-lg font-semibold mb-2">Contract Deployed</h3>
+                    <p className="text-sm">Transaction Hash:</p>
+                    <p className="text-xs font-mono break-all">{hash}</p>
+                </div>
+            )}
         </div>
     );
 };
