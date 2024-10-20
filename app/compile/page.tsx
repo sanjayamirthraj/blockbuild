@@ -13,7 +13,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { deployContract } from '@wagmi/core'
 import { config } from '../../lib/wagmi'
 import { type DeployContractReturnType } from '@wagmi/core'
-
+import { Transaction } from '@mysten/sui/transactions';
 
 
 //todo
@@ -79,19 +79,23 @@ const CompilePage: React.FC = () => {
             }),
         });
         const outputs = await response.json();
+       
 
-        const resultofcompilation = await fetch('/compile-contract', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
 
-                body: JSON.stringify({ contractName: outputs.contractName, name: outputs.contractName.toString }),
-            });
-            const compilationResult = await resultofcompilation.json();
-            setApiResponse(compilationResult.abi); 
-            setBytecode(compilationResult.bytecode);
+        // const resultofcompilation = await fetch('/compile-contract', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+
+        //         body: JSON.stringify({ contractName: outputs.contractName, name: outputs.contractName.toString }),
+        //     });
+        //     const compilationResult = await resultofcompilation.json();
+        //     setApiResponse(compilationResult.abi); 
+        //     setBytecode(compilationResult.bytecode);
     };
+
+
 
 
     return (

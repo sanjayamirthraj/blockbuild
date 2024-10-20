@@ -79,7 +79,7 @@ const ContractDeployment: React.FC<{ hash: `0x${string}` }> = ({ hash }) => {
       <div className='w-full'>
       <h2 className="text-lg mb-2">Your Contract Code</h2>
         <div className='text-[#B2B2B2] text-sm font-mono w-full bg-[#202020] border-[1px] border-[#3C3C3C] p-6 whitespace-pre-wrap'>
-          {contractCode || '// Loading contract code...'}
+          {contractCode ? contractCode.replace(/^```move\n/, '') : '// Loading contract code...'}
         </div>
       </div>
     </div>

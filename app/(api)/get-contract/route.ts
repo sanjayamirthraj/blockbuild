@@ -4,7 +4,7 @@ import path from 'path';
 
 export async function GET() {
     try {
-        const filePath = path.join(process.cwd(), 'test.sol');
+        const filePath = path.join(process.cwd(), 'test.mov');
         const contractCode = await fs.readFile(filePath, 'utf8');
         return NextResponse.json({ contractCode });
     } catch (error) {
