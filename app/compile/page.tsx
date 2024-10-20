@@ -48,6 +48,11 @@ const CompilePage: React.FC = () => {
         }
     }, [searchParams]);
 
+    useEffect(() => {
+        // This effect will run whenever the hash changes
+        // You can add any additional logic here if needed
+    }, [hash]);
+
     const handleCompile = async () => {
         const flowSummaryJSON = {
             nodes: nodes,
@@ -60,8 +65,10 @@ const CompilePage: React.FC = () => {
             .replace(/[{}"]/g, '')
             .replace(/:/g, ': ')
             .replace(/,/g, ', ');
-        console.log(bodyofthecall)
-        const response = await fetch('/send-to-rag', {
+
+
+       console.log(bodyofthecall)
+       const response = await fetch('/send-to-rag', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -72,22 +79,27 @@ const CompilePage: React.FC = () => {
             }),
         });
         const outputs = await response.json();
+
         const resultofcompilation = await fetch('/compile-contract', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ contractName: "TokenSwap", name: outputs.contractName }),
-        });
-        const compilationResult = await resultofcompilation.json();
-        setApiResponse(compilationResult.abi); // Store the API response in state
-        setBytecode(compilationResult.bytecode);
+
+                body: JSON.stringify({ contractName: outputs.contractName, name: outputs.contractName.toString }),
+            });
+            const compilationResult = await resultofcompilation.json();
+            setApiResponse(compilationResult.abi); 
+            setBytecode(compilationResult.bytecode);
     };
 
 
     return (
         <div className="flex flex-col min-h-screen text-white">
             <Navbar />
+            <div className="absolute top-20 right-4 hover:none">
+                <ConnectButton />
+            </div>
             <Sidebar />
 
 
@@ -139,7 +151,7 @@ const CompilePage: React.FC = () => {
                     <section className="w-1/2 p-4">
                         {hash ? (
                             <ContractDeployment hash={hash} />
-                        ) : <ContractDeployment hash="" />}
+                        ) : <ContractDeployment hash={`0x${"TX Hash will appear here"}`} />}
                     </section>
                 </main>
             </div>
@@ -200,6 +212,7 @@ const CompilePage: React.FC = () => {
                             bytecode: bytcodes,
                             args: [10],
                         });
+
                         setHash(result as `0x${string}`);
                     }}
                 >
@@ -207,6 +220,15 @@ const CompilePage: React.FC = () => {
                     Deploy Contract
                 </Button>
             </div>
+
+            {/* New div to display hash information */}
+            {hash && (
+                <div className="fixed bottom-16 right-4 bg-gray-800 p-4 rounded-lg shadow-lg">
+                    <h3 className="text-lg font-semibold mb-2">Contract Deployed</h3>
+                    <p className="text-sm">Transaction Hash:</p>
+                    <p className="text-xs font-mono break-all">{hash}</p>
+                </div>
+            )}
         </div>
     );
 };

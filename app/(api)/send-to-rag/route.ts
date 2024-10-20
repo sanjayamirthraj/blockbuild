@@ -17,7 +17,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
                 Authorization: 'Bearer sid-sk-rY7kT9_Mj1ELODrHNZ4d3111yuVnjlUl-GgjeVmVRMay',
                 'Content-Type': 'application/json'
             },
-            body: `{"query":"Develop a solidity code for a smart contract.Do not give this a different name. You will be given the name of the contract as  DemoContract that is secure and efficient. The following is an object that lists all the methods and their parameters. Only return the smart contract code. Do not make placeholder comments. Implement all methods. Do not have comments in the code. Do not return anything else. This is the spec:${message}.","limit":1}`
+            body: `{"query":"Develop a solidity code for a smart contract.Do not give this a different name. You will be given the name of the contract as  DemoContract that is secure and efficient. The following is an object that lists all the methods and their parameters. Only return the smart contract code. Do not make placeholder comments. Implement all methods. Do not have comments in the code. Do not return anything else. This is the template: constract DemoContract {}. This is the spec:${message}.","limit":1}`
 
         };
         fetch('https://top-tier-wasserstein-distance.sid.ai/query', options)
@@ -28,10 +28,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
         const formattedCode = await generateAndFormatSolidityCode(message);
         const contractNameMatch = formattedCode.match(/^(?!.*abstract).*contract\s+(\w+)/m);
-        const name = contractNameMatch ? contractNameMatch[1] : "DefaultContract";
-        console.log("name is", name)
-        // console.log(formattedCode);
-        fs.writeFileSync(`test.sol`, formattedCode);
+        const name = "ContractDemo";
+
+        // Replace the original contract name with "ContractDemo"
+        const updatedCode = formattedCode.replace(/contract\s+\w+/, `contract ${name}`);
+
+        console.log("Contract name is", name);
+        fs.writeFileSync(`test.sol`, updatedCode);
         return new NextResponse(JSON.stringify({ fileName: "test.sol", contractName: name }));
     } catch (error) {
         return new NextResponse(JSON.stringify({ error: "send-to-rag is not working" }), { status: 500 });
@@ -42,7 +45,7 @@ async function generateAndFormatSolidityCode(message: string): Promise<string> {
     const code = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
-            { "role": "user", "content": "Develop a solidity code for a smart contract that is secure and efficient. The following is a json object that lists all the methods and their paramters. Only return the smart contract code. Do NOT make placeholder comments. Make sure that the smart contract has preloaded arguments.CODE UP EVERYTHING Do not return anything else. This is the json object: " + message }
+            { "role": "user", "content": "Develop a solidity code for a smart contract that is secure and efficient. The following is a json object that lists all the methods and their paramters. Only return the smart contract code. Do NOT make placeholder comments.Code out the entire things. Make sure that the smart contract has preloaded arguments.CODE UP EVERYTHING. Do not return anything else. This is the json object: " + message }
         ]
     });
     return formatSolidityCode(code.choices[0].message.content as string);
