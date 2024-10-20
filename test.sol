@@ -1,11 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract TokenContract {
+contract TokenSwap {
+    address public token1;
+    address public token2;
     address public owner;
     mapping(address => uint256) public balances;
 
-    constructor() {
+    event Swapped(address indexed user, address tokenSwapped, address tokenReceived, uint256 amount);
+
+    constructor(address _token1, address _token2) {
+        token1 = _token1;
+        token2 = _token2;
         owner = msg.sender;
     }
 
@@ -14,25 +20,25 @@ contract TokenContract {
         _;
     }
 
-    function allocateTokens(address recipient, uint256 amount) external onlyOwner {
-        require(recipient != address(0), "Invalid address");
-        balances[recipient] += amount;
-    }
+    function swap(address _tokenFrom, uint256 _amount) external {
+        require(_tokenFrom == token1 || _tokenFrom == token2, "Invalid token");
+        require(balances[msg.sender] >= _amount, "Insufficient balance");
 
-    function swapTokens(address from, address to, uint256 amount) external {
-        require(balances[from] >= amount, "Insufficient balance");
-        require(to != address(0), "Invalid recipient address");
+        address tokenTo = _tokenFrom == token1 ? token2 : token1;
         
-        balances[from] -= amount;
-        balances[to] += amount;
+        balances[msg.sender] -= _amount;
+        balances[tokenTo] += _amount;
+
+        emit Swapped(msg.sender, _tokenFrom, tokenTo, _amount);
     }
 
-    function connectWallet() external view returns (string memory) {
-        return "Wallet connected";
+    function allocateTokens(address _user, uint256 _amount, address _token) external onlyOwner {
+        require(_token == token1 || _token == token2, "Invalid token");
+        balances[_user] += _amount;
     }
 
-    function disconnect() external view returns (string memory) {
-        return "Disconnected";
+    function disconnect() external onlyOwner {
+        selfdestruct(payable(owner));
     }
 }
 ```

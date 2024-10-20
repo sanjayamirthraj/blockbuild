@@ -81,7 +81,7 @@ import EventNode from './EventNode'
 // Define the different block types with their properties
 const blockTypes = [
   // Trigger Actions
-  { id: 'initialise', content: 'Upon Initialise', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Flag },
+  { id: 'start', content: 'Upon Initialise', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Flag },
   { id: 'end', content: 'Disconnect', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Power },
 
   // Token Actions
