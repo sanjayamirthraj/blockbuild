@@ -63,7 +63,6 @@ async function DeployContractToRootstock(contractABI: any, contractBytecode: str
 
 export async function POST(req: NextRequest, res: NextResponse) {
     const { contractABI, contractBytecode, deploymentNetwork, args } = await req.json();
-    // const { deployContract } = useDeployContract()
 
     const contractABITest = [
         {

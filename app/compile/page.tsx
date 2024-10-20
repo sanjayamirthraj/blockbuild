@@ -48,6 +48,11 @@ const CompilePage: React.FC = () => {
         }
     }, [searchParams]);
 
+    useEffect(() => {
+        // This effect will run whenever the hash changes
+        // You can add any additional logic here if needed
+    }, [hash]);
+
     const handleCompile = async () => {
         const flowSummaryJSON = {
             nodes: nodes,
@@ -61,7 +66,10 @@ const CompilePage: React.FC = () => {
             .replace(/:/g, ': ')
             .replace(/,/g, ', ');
        console.log(bodyofthecall)
-        const response = await fetch('/send-to-rag', {
+      
+      
+      
+       const response = await fetch('/send-to-rag', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -72,15 +80,16 @@ const CompilePage: React.FC = () => {
             }),
         });
         const outputs = await response.json();
+
         const resultofcompilation = await fetch('/compile-contract', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-                body: JSON.stringify({ contractName: "TokenSwap", name: outputs.contractName }),
+                body: JSON.stringify({ contractName: outputs.contractName, name: outputs.contractName.toString }),
             });
             const compilationResult = await resultofcompilation.json();
-            setApiResponse(compilationResult.abi); // Store the API response in state
+            setApiResponse(compilationResult.abi); 
             setBytecode(compilationResult.bytecode);
     };
 
@@ -192,6 +201,7 @@ const CompilePage: React.FC = () => {
                                 bytecode: bytcodes,
                                 args: [10], 
                         });
+                        console.log(result)
                         setHash(result as `0x${string}`);
                     }}
                 >
