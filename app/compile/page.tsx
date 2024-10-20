@@ -140,7 +140,7 @@ const CompilePage: React.FC = () => {
                     <section className="w-1/2 p-4">
                         {hash ? (
                             <ContractDeployment hash={hash} />
-                        ) : <ContractDeployment hash="" />}
+                        ) : <ContractDeployment hash={`0x${"TX Hash will appear here"}`} />}
                     </section>
                 </main>
             </div>
