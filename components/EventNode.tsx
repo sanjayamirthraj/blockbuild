@@ -1,13 +1,14 @@
 import React, { useState, useCallback } from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Fan } from 'lucide-react'
+import { Fan, ChevronLeft, ChevronRight, Equal, Pencil  } from 'lucide-react'
 
 const currencies = ['ETH', 'USDT', 'BTC', 'DAI', 'LINK']
 
 const EventNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
     const [fromCurrency, setFromCurrency] = useState(currencies[0])
     const [toCurrency, setToCurrency] = useState(currencies[1])
+    const [comparisonType, setComparisonType] = useState('')
 
     const onFromCurrencyChange = useCallback((value: string) => {
         setFromCurrency(value)
@@ -15,6 +16,10 @@ const EventNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
 
     const onToCurrencyChange = useCallback((value: string) => {
         setToCurrency(value)
+    }, [])
+
+    const onComparisonTypeChange = useCallback((value: string) => {
+        setComparisonType(value)
     }, [])
 
     return (
@@ -36,7 +41,18 @@ const EventNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
                         ))}
                     </SelectContent>
                 </Select>
-                <div className='text-sm'>does</div>
+                
+                <Select onValueChange={onComparisonTypeChange} value={comparisonType}>
+                    <SelectTrigger className="w-full bg-[#5A0606] border-[1px] border-[#791919]">
+                        <SelectValue placeholder="Select comparison" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="lessThan" className='flex flex-row items-center'> Less Than</SelectItem>
+                        <SelectItem value="greaterThan" className='flex flex-row items-center'> Greater Than</SelectItem>
+                        <SelectItem value="equalTo" className='flex flex-row items-center'> Equal To</SelectItem>
+                        <SelectItem value="custom" className='flex flex-row items-center'>Custom</SelectItem>
+                    </SelectContent>
+                </Select>
                 
                 <Select onValueChange={onToCurrencyChange} value={toCurrency}>
                     <SelectTrigger className="w-full bg-[#5A0606] border-[1px] border-[#791919]">
