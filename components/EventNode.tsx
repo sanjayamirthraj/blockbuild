@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowRightLeft } from 'lucide-react'
+import { Fan } from 'lucide-react'
 
 const currencies = ['ETH', 'USDT', 'BTC', 'DAI', 'LINK']
 
@@ -18,14 +18,14 @@ const EventNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
     }, [])
 
     return (
-        <div className="bg-[#142321] text-white p-4 rounded-lg shadow-md border-[1px] border-[#245C3D] hover:border-[#6AFB8E] transition-colors w-[250px]">
+        <div className="bg-[#4A0505] text-white p-4 rounded-lg shadow-md border-[1px] border-[#791919] hover:border-[#BC2F2F] transition-colors w-[250px]">
             <div className="flex items-center justify-between mb-4">
-                <span>Swap Tokens</span>
-                <ArrowRightLeft className="w-4 h-4" />
+                <span>On Event</span>
+                <Fan className="w-4 h-4" />
             </div>
             <div className="flex flex-col space-y-2" onClick={(e) => e.stopPropagation()}>
                 <Select onValueChange={onFromCurrencyChange} value={fromCurrency}>
-                    <SelectTrigger className="w-full bg-[#113731] border-[1px] border-[#245C3D]">
+                    <SelectTrigger className="w-full bg-[#5A0606] border-[1px] border-[#791919]">
                         <SelectValue placeholder="From" />
                     </SelectTrigger>
                     <SelectContent>
@@ -36,9 +36,10 @@ const EventNode: React.FC<NodeProps> = ({ data, isConnectable }) => {
                         ))}
                     </SelectContent>
                 </Select>
-                <div className='text-sm'>for</div>
+                <div className='text-sm'>does</div>
+                
                 <Select onValueChange={onToCurrencyChange} value={toCurrency}>
-                    <SelectTrigger className="w-full bg-[#113731] border-[1px] border-[#245C3D]">
+                    <SelectTrigger className="w-full bg-[#5A0606] border-[1px] border-[#791919]">
                         <SelectValue placeholder="To" />
                     </SelectTrigger>
                     <SelectContent>

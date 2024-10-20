@@ -30,6 +30,7 @@ import {
   Landmark,
   Droplets,
   HandCoins,
+  Fan,
 } from 'lucide-react'
 import ReactFlow, {
   Background,
@@ -56,6 +57,7 @@ import SwapNode from './SwapNode'
 import StakeNode from './StakeNode'
 import LiquidityNode from './LiquidityNode'
 import AllocateNode from './AllocateNode'
+import EventNode from './EventNode'
 
 // Define the different block types with their properties
 const blockTypes = [
@@ -68,8 +70,7 @@ const blockTypes = [
   { id: 'stake', content: 'Stake Tokens', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', hoverBorderColor: 'hover:border-[#FB6A9E]', icon: Landmark },
   { id: 'allocate', content: 'Allocate Tokens', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: HandCoins },
   { id: 'disconnect', content: 'Disconnect from Wallet', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
-  { id: 'when', content: 'ffff', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
-  { id: 'if', content: 'eee', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
+  { id: 'event', content: 'On Event Outcome', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Fan },
 ]
 
 // Group blocks into categories for the sidebar
@@ -78,7 +79,7 @@ const groupedBlocks = {
   "Token Actions": blockTypes.filter(block => ['swap', 'stake', 'allocate'].includes(block.id)),
   "Liquidity": blockTypes.filter(block => block.id === 'liquidity'),
   "Governance": blockTypes.filter(block => block.id === 'governance'),
-  "Events": blockTypes.filter(block => block.id === 'events, when, if'),
+  "Events": blockTypes.filter(block => block.id === 'event'),
 }
 
 // Form validation schema using Zod
@@ -103,6 +104,9 @@ const BlockNode = ({ data, isDragging, id }) => {
   if (data.id === 'allocate') {
     return <AllocateNode data={data} isConnectable={true} selected={false} type={''} zIndex={0} xPos={0} yPos={0} dragging={false} />;
   }
+  if (data.id === 'event') {
+    return <EventNode data={data} isConnectable={true} id={''} selected={false} type={''} zIndex={0} xPos={0} yPos={0} dragging={false} />;
+  }
   return (
     <div
       className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
@@ -123,6 +127,7 @@ const nodeTypes = {
   swapNode: SwapNode,
   stakeNode: StakeNode,
   liquidityNode: LiquidityNode,
+  eventNode: EventNode,
 }
 
 // Main component for the DeFi Blocks builder
@@ -189,7 +194,8 @@ function Web3BlocksComponent() {
       id: newNodeId,
       type: block.id === 'stake' ? 'stakeNode' : 
             block.id === 'swap' ? 'swapNode' :
-            block.id === 'liquidity' ? 'liquidityNode' : 'blockNode',
+            block.id === 'liquidity' ? 'liquidityNode' :
+            block.id === 'event' ? 'eventNode' : 'blockNode',
       position: { x: 100, y: 100 + nodes.length * 100 },
       data: {
         ...block,
