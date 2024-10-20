@@ -29,6 +29,27 @@ import {
   Code,
   Landmark,
   Droplets,
+  HandCoins,
+  Fan,
+  Sprout,
+  Tractor,
+  BarChart3,
+  Clock,
+  Package,
+  TrendingDown,
+  TrendingUp,
+  PiggyBank,
+  Coins,
+  Banknote,
+  Users,
+  Zap,
+  Briefcase,
+  LockKeyhole,
+  Gift,
+  History,
+  ChartLine,
+  Plane,
+  Flag,
 } from 'lucide-react'
 import ReactFlow, {
   Background,
@@ -54,29 +75,62 @@ import CustomBlockModal from './CustomBlockModal'
 import SwapNode from './SwapNode'
 import StakeNode from './StakeNode'
 import LiquidityNode from './LiquidityNode'
+import AllocateNode from './AllocateNode'
+import EventNode from './EventNode'
 
 // Define the different block types with their properties
 const blockTypes = [
-  // Each block represents an action in the DeFi flow
-  { id: 'start', content: 'Connect Wallet', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
-  { id: 'end', content: 'Disconnect', color: 'bg-red-800', borderColor: 'bg-red-600', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Wallet },
+  // Trigger Actions
+  { id: 'start', content: 'Upon Initialise', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Flag },
+  { id: 'end', content: 'Disconnect', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Power },
+
+  // Token Actions
   { id: 'swap', content: 'Swap Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: ArrowRightLeft },
+  { id: 'stake', content: 'Stake Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: Landmark },
+  { id: 'allocate', content: 'Allocate Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: HandCoins },
+  { id: 'startYieldFarming', content: 'Start Yield Farming', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: Sprout },
+  { id: 'stopYieldFarming', content: 'Stop Yield Farming', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: Tractor },
+  { id: 'lendTokens', content: 'Lend Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: PiggyBank },
+  { id: 'borrowTokens', content: 'Borrow Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: Coins },
+  { id: 'repayLoan', content: 'Repay Loan', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: Banknote },
+  { id: 'claimTokens', content: 'Claim Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: Gift },
+
+  // Liquidity
   { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: Droplets },
+  { id: 'createStakingPool', content: 'Create Staking Pool', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: Users },
+
+  // Portfolio Management
+  { id: 'rebalancePortfolio', content: 'Rebalance Portfolio', color: 'bg-[#2F1E3A]', borderColor: 'border-[#472A56]', hoverBorderColor: 'hover:border-[#663E7D]', icon: BarChart3 },
+  { id: 'setRebalanceFrequency', content: 'Set Rebalance Frequency', color: 'bg-[#2F1E3A]', borderColor: 'border-[#472A56]', hoverBorderColor: 'hover:border-[#663E7D]', icon: Clock },
+  { id: 'createCustomIndex', content: 'Create Custom Index', color: 'bg-[#2F1E3A]', borderColor: 'border-[#472A56]', hoverBorderColor: 'hover:border-[#663E7D]', icon: Package },
+  { id: 'setStopLoss', content: 'Set Stop Loss', color: 'bg-[#2F1E3A]', borderColor: 'border-[#472A56]', hoverBorderColor: 'hover:border-[#663E7D]', icon: TrendingDown },
+  { id: 'setTakeProfit', content: 'Set Take Profit', color: 'bg-[#2F1E3A]', borderColor: 'border-[#472A56]', hoverBorderColor: 'hover:border-[#663E7D]', icon: TrendingUp },
+  { id: 'setStrategy', content: 'Set Strategy', color: 'bg-[#2F1E3A]', borderColor: 'border-[#472A56]', hoverBorderColor: 'hover:border-[#663E7D]', icon: Briefcase },
+
+  // Governance
   { id: 'governance', content: 'Vote on Proposal', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: MessageSquare },
-  { id: 'stake', content: 'Stake Tokens', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', hoverBorderColor: 'hover:border-[#FB6A9E]', icon: Landmark },
-  { id: 'allocate', content: 'Allocate Tokens', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: DollarSign },
-  { id: 'disconnect', content: 'Disconnect from Wallet', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
-  { id: 'when', content: 'ffff', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
-  { id: 'if', content: 'eee', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
+  { id: 'createVesting', content: 'Create Vesting', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: LockKeyhole },
+
+  // Events
+  { id: 'event', content: 'On Event Outcome', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Fan },
+  { id: 'executeFlashLoan', content: 'Execute Flash Loan', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Zap },
+  { id: 'initiateAirdrop', content: 'Initiate Airdrop', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Plane },
+
+  // Analytics
+  { id: 'getTransactionHistory', content: 'Get Transaction History', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: History },
+  { id: 'getPortfolioAnalytics', content: 'Get Portfolio Analytics', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: ChartLine },
 ]
 
 // Group blocks into categories for the sidebar
 const groupedBlocks = {
-  "Trigger Actions": blockTypes.filter(block => ['start', 'end'].includes(block.id)),
-  "Token Actions": blockTypes.filter(block => ['swap', 'stake', 'allocate'].includes(block.id)),
-  "Liquidity": blockTypes.filter(block => block.id === 'liquidity'),
-  "Governance": blockTypes.filter(block => block.id === 'governance'),
-  "Events": blockTypes.filter(block => block.id === 'events, when, if'),
+  "Trigger Actions": blockTypes.filter(block => ['start', 'end', 'disconnect', 'initialise'].includes(block.id)),
+  "Token Actions": blockTypes.filter(block => ['swap', 'stake', 'allocate', 'startYieldFarming', 'stopYieldFarming', 'lendTokens', 'borrowTokens', 'repayLoan', 'claimTokens'].includes(block.id)),
+  "Liquidity": blockTypes.filter(block => ['liquidity', 'createStakingPool'].includes(block.id)),
+  "Portfolio Management": blockTypes.filter(block => ['rebalancePortfolio', 'setRebalanceFrequency', 'createCustomIndex', 'setStopLoss', 'setTakeProfit', 'setStrategy'].includes(block.id)),
+  "Governance": blockTypes.filter(block => ['governance', 'createVesting'].includes(block.id)),
+  "Events": blockTypes.filter(block => ['event', 'executeFlashLoan', 'initiateAirdrop'].includes(block.id)),
+  "Analytics": blockTypes.filter(block => ['getTransactionHistory', 'getPortfolioAnalytics'].includes(block.id)),
+  "Custom": blockTypes.filter(block => ['custom'].includes(block.id)),
 }
 
 // Form validation schema using Zod
@@ -98,6 +152,12 @@ const BlockNode = ({ data, isDragging, id }) => {
   if (data.id === 'liquidity') {
     return <LiquidityNode data={data} isConnectable={true} id={''} selected={false} type={''} zIndex={0} xPos={0} yPos={0} dragging={false} />;
   }
+  if (data.id === 'allocate') {
+    return <AllocateNode data={data} isConnectable={true} selected={false} type={''} zIndex={0} xPos={0} yPos={0} dragging={false} />;
+  }
+  if (data.id === 'event') {
+    return <EventNode data={data} isConnectable={true} id={''} selected={false} type={''} zIndex={0} xPos={0} yPos={0} dragging={false} />;
+  }
   return (
     <div
       className={`${data.color} text-white p-6 rounded-lg shadow-md cursor-pointer select-none
@@ -118,6 +178,7 @@ const nodeTypes = {
   swapNode: SwapNode,
   stakeNode: StakeNode,
   liquidityNode: LiquidityNode,
+  eventNode: EventNode,
 }
 
 // Main component for the DeFi Blocks builder
@@ -184,7 +245,8 @@ function Web3BlocksComponent() {
       id: newNodeId,
       type: block.id === 'stake' ? 'stakeNode' : 
             block.id === 'swap' ? 'swapNode' :
-            block.id === 'liquidity' ? 'liquidityNode' : 'blockNode',
+            block.id === 'liquidity' ? 'liquidityNode' :
+            block.id === 'event' ? 'eventNode' : 'blockNode',
       position: { x: 100, y: 100 + nodes.length * 100 },
       data: {
         ...block,
@@ -363,7 +425,7 @@ function Web3BlocksComponent() {
   return (
     <div className="flex h-screen bg-[#141313] pt-8 selectable-none">
       {/* Sidebar */}
-      <div className="relative translate-y-[1px]">
+      <div className="relative translate-y-[1px] h-full">
         {/* Toggle sidebar button */}
         <Button
           variant="outline"
@@ -387,9 +449,9 @@ function Web3BlocksComponent() {
           initial={false}
           animate={{ width: isOpen ? "18.4rem" : "0rem" }}
           transition={{ duration: 0.3 }}
-          className="bg-[#141313] border-r border-[#555555] overflow-hidden h-full"
+          className="bg-[#141313] border-r border-[#555555] overflow-hidden h-full flex flex-col"
         >
-          <div className="p-6 w-72 pt-12 selectable-none cursor-default">
+          <div className="p-6 w-72 pt-12 selectable-none cursor-default overflow-y-auto flex-grow">
             <h2 className="text-2xl font mt-4 mb-4 text-white">DeFi Blocks</h2>
             <div className="flex flex-col gap-6">
               {Object.entries(groupedBlocks).map(([category, blocks]) => (
@@ -412,18 +474,18 @@ function Web3BlocksComponent() {
                   </div>
                 </div>
               ))}
-
-              {/* Custom Block button */}
-              <div className="mt-16 w-full">
-                <Button
-                  onClick={handleAddCustomBlock}
-                  className="bg-white text-black w-full"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Custom Block
-                </Button>
-              </div>
             </div>
+          </div>
+
+          {/* Custom Block button */}
+          <div className="pb-12 p-6 w-72">
+            <Button
+              onClick={handleAddCustomBlock}
+              className="bg-white text-black w-full"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Custom Block
+            </Button>
           </div>
         </motion.div>
       </div>
