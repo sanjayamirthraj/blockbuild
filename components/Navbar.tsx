@@ -22,8 +22,8 @@ export default function Navbar() {
                 <div className="flex flex-row space-x-4 ">
 
                     <div className="flex items-center space-x-4 flex-grow mr-12">
-                        <div className="flex items-center space-x-2 mr-1">
-                            <Image src="/sui.png" alt="Sui Logo" className="w-16 inline-block mr-2" width={100} height={100}/>
+                        <div className="flex items-center space-x-2 -mr-1">
+                            <Image src="/sui.png" alt="SUI Logo" className="w-14 inline-block" width={100} height={100}/>
                         </div>
                         <span className="text-gray-500">×</span>
                         <span className="text-gray-300">Building Blocks</span>
@@ -55,9 +55,10 @@ function NavItem({ icon, text, href }: { icon: React.ReactNode; text: string; hr
             <div className="group h-16 px-10 justify-center items-center inline-flex border-white/30 border-x-[1px] cursor-pointer overflow-hidden relative">
                 <div className="text-white text-sm font-normal font-['Satoshi Variable'] z-10 group-hover:-translate-y-1 transition-transform duration-300 ease-in-out">{text}</div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-64 h-64 translate-y-full group-hover:translate-y-1/2 blur-md rounded-full bg-gradient-to-t from-[#E073FF]/50 to-[#E073FF]/10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform"/>
+                    <div className="w-64 h-64 translate-y-full group-hover:translate-y-1/2 blur-md rounded-full bg-gradient-to-t from-[#7392FF]/50 to-[#7392FF]/10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform"/>
                 </div>
             </div>
         </Link>
     );
 }
+
