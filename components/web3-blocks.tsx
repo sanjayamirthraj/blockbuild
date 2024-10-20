@@ -29,6 +29,7 @@ import {
   Code,
   Landmark,
   Droplets,
+  HandCoins,
 } from 'lucide-react'
 import ReactFlow, {
   Background,
@@ -54,6 +55,7 @@ import CustomBlockModal from './CustomBlockModal'
 import SwapNode from './SwapNode'
 import StakeNode from './StakeNode'
 import LiquidityNode from './LiquidityNode'
+import AllocateNode from './AllocateNode'
 
 // Define the different block types with their properties
 const blockTypes = [
@@ -64,7 +66,7 @@ const blockTypes = [
   { id: 'liquidity', content: 'Add Liquidity', color: 'bg-[#17273E]', borderColor: 'border-[#2F5B87]', hoverBorderColor: 'hover:border-[#87C6E0]', icon: Droplets },
   { id: 'governance', content: 'Vote on Proposal', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: MessageSquare },
   { id: 'stake', content: 'Stake Tokens', color: 'bg-[#322131]', borderColor: 'border-[#663B6A]', hoverBorderColor: 'hover:border-[#FB6A9E]', icon: Landmark },
-  { id: 'allocate', content: 'Allocate Tokens', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: DollarSign },
+  { id: 'allocate', content: 'Allocate Tokens', color: 'bg-[#21173E]', borderColor: 'border-[#35285B]', hoverBorderColor: 'hover:border-[#A57BBE]', icon: HandCoins },
   { id: 'disconnect', content: 'Disconnect from Wallet', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
   { id: 'when', content: 'ffff', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
   { id: 'if', content: 'eee', color: 'bg-[#4A0505]', borderColor: 'border-[#791919]', hoverBorderColor: 'hover:border-[#BC2F2F]', icon: Power },
@@ -97,6 +99,9 @@ const BlockNode = ({ data, isDragging, id }) => {
   }
   if (data.id === 'liquidity') {
     return <LiquidityNode data={data} isConnectable={true} id={''} selected={false} type={''} zIndex={0} xPos={0} yPos={0} dragging={false} />;
+  }
+  if (data.id === 'allocate') {
+    return <AllocateNode data={data} isConnectable={true} selected={false} type={''} zIndex={0} xPos={0} yPos={0} dragging={false} />;
   }
   return (
     <div

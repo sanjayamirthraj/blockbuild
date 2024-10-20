@@ -1,42 +1,38 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract TokenSwap {
+contract TokenContract {
     address public owner;
-    bool public isConnected;
-
-    event WalletConnected(address indexed user);
-    event WalletDisconnected(address indexed user);
-    event TokensSwapped(address indexed user, uint256 amountIn, uint256 amountOut);
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not the owner");
-        _;
-    }
-
-    modifier onlyConnected() {
-        require(isConnected, "Wallet not connected");
-        _;
-    }
+    mapping(address => uint256) public balances;
 
     constructor() {
         owner = msg.sender;
-        isConnected = false;
     }
 
-    function connectWallet() external onlyOwner {
-        isConnected = true;
-        emit WalletConnected(msg.sender);
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not authorized");
+        _;
     }
 
-    function swapTokens(uint256 amountIn, uint256 rate) external onlyConnected {
-        // Swap logic here
-        uint256 amountOut = amountIn * rate; // Simplified example of swap logic
-        emit TokensSwapped(msg.sender, amountIn, amountOut);
+    function allocateTokens(address recipient, uint256 amount) external onlyOwner {
+        require(recipient != address(0), "Invalid address");
+        balances[recipient] += amount;
     }
 
-    function disconnectWallet() external onlyOwner {
-        isConnected = false;
-        emit WalletDisconnected(msg.sender);
+    function swapTokens(address from, address to, uint256 amount) external {
+        require(balances[from] >= amount, "Insufficient balance");
+        require(to != address(0), "Invalid recipient address");
+        
+        balances[from] -= amount;
+        balances[to] += amount;
+    }
+
+    function connectWallet() external view returns (string memory) {
+        return "Wallet connected";
+    }
+
+    function disconnect() external view returns (string memory) {
+        return "Disconnected";
     }
 }
+```
