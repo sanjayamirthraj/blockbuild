@@ -97,6 +97,9 @@ const CompilePage: React.FC = () => {
     return (
         <div className="flex flex-col min-h-screen text-white">
             <Navbar />
+            <div className="absolute top-20 right-4 hover:none">
+                <ConnectButton />
+            </div>
             <Sidebar />
           
 
@@ -111,7 +114,6 @@ const CompilePage: React.FC = () => {
                                 flowSummary={flowSummary} 
                             
                             />
-                              <ConnectButton/>
                         </div>
                         <Link href="/">
                             <Button variant="ghost" className="mb-4 group text-white/50 hover:text-white hover:bg-white/5">
