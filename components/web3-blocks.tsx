@@ -130,6 +130,7 @@ const groupedBlocks = {
   "Governance": blockTypes.filter(block => ['governance', 'createVesting'].includes(block.id)),
   "Events": blockTypes.filter(block => ['event', 'executeFlashLoan', 'initiateAirdrop'].includes(block.id)),
   "Analytics": blockTypes.filter(block => ['getTransactionHistory', 'getPortfolioAnalytics'].includes(block.id)),
+  "Custom": blockTypes.filter(block => ['custom'].includes(block.id)),
 }
 
 // Form validation schema using Zod
