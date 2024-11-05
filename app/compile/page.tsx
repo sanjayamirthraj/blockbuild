@@ -13,7 +13,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { deployContract } from '@wagmi/core'
 import { config } from '../../lib/wagmi'
 import { type DeployContractReturnType } from '@wagmi/core'
-import { Transaction } from '@mysten/sui/transactions';
+// import { Transaction } from '@mysten/sui/transactions';
 
 
 //todo

@@ -12,8 +12,8 @@ export default function LoginPage() {
                 <div className="w-1/3 relative justify-center items-center ml-40 mt-40">
                     <Link href="/home">
                         <Image
-                            src="/XRPLAuth.svg"
-                            alt="Login Illustration"
+                            src="/login.svg"
+                            alt="Rootstoc"
                             priority
                             className="draggable-none pointer-events-none"
                             width={350}
@@ -24,10 +24,10 @@ export default function LoginPage() {
                 </div>
 
                 {/* Pattern SVG */}
-                <div className="w-2/3 relative ml-56">
+                <div className="w-2/3 relative ml-52 -mt-5">
                     <Image
-                        src="/XRPL.svg"
-                        alt="XRPL Background Pattern"
+                        src="/pattern.svg"
+                        alt="rootstock Background Pattern"
                         priority
                         className="draggable-none pointer-events-none"
                         width={1500}

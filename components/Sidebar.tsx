@@ -21,13 +21,13 @@ const Sidebar: React.FC = () => {
             <li key={index} className="relative group">
               <Link legacyBehavior href={item.href} passHref>
                 <a
-                  className={`translate-x-[1px] px-4 py-2 h-20 transition-all duration-300 flex flex-col justify-end relative overflow-hidden group hover:bg-gradient-to-r hover:from-[#7392FF]/10 hover:to-transparent before:absolute before:inset-0 before:bg-gradient-to-r before:from-[#7392FF]/10 before:to-transparent before:translate-x-[-100%] hover:before:translate-x-0 before:transition-transform before:duration-300 border-b border-r border-[#555555] ${
-                    pathname === item.href ? 'bg-[#7392FF]/10' : ''
+                  className={`translate-x-[1px] px-4 py-2 h-20 transition-all duration-300 flex flex-col justify-end relative overflow-hidden group hover:bg-gradient-to-r hover:from-[#FF70E0]/10 hover:to-transparent before:absolute before:inset-0 before:bg-gradient-to-r before:from-[#FF70E0]/10 before:to-transparent before:translate-x-[-100%] hover:before:translate-x-0 before:transition-transform before:duration-300 border-b border-r border-[#555555] ${
+                    pathname === item.href ? 'bg-[#FF70E0]/10' : ''
                   }`}
                 >
                   <div className="mb-2 flex flex-col justify-end ">
                     {item.subtitle && (
-                      <span className="text-xs text-[#7392FF] block ">{item.subtitle}</span>
+                      <span className="text-xs text-[#FF70E0] block ">{item.subtitle}</span>
                     )}
                     <div className="text-sm break-words group-hover:translate-x-2 transition-transform duration-300 ease-in-out">{item.title}</div>
                   </div>
