@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Search, Sparkles, RotateCcw, Plus, Check, Info } from 'lucide-react'
+import { X, Search, Sparkles, RotateCcw, Plus, Check } from 'lucide-react'
 import { Button } from './ui/Button'
 import { useState } from 'react'
 
@@ -50,11 +50,6 @@ interface VariablesModalProps {
 
 export function VariablesModal({ isOpen, onClose }: VariablesModalProps) {
   const [search, setSearch] = useState('')
-  const [selectedVariable, setSelectedVariable] = useState<string | null>('Co2 Distribution')
-
-  const handleVariableClick = (variable: Variable) => {
-    setSelectedVariable(variable.name)
-  }
 
   return (
     <AnimatePresence>
@@ -114,13 +109,10 @@ export function VariablesModal({ isOpen, onClose }: VariablesModalProps) {
                             key={variable.name}
                             variant="standard"
                             className={`${
-                              selectedVariable === variable.name 
-                                ? 'bg-[#3f4d27] text-[#C9FF3B] border-[#C9FF3B] flex flex-row items-center px-2 ' 
-                                : variable.active 
-                                  ? 'bg-[#3f4d27] text-[#C9FF3B] flex flex-row items-center px-2 rounded-full' 
-                                  : ''
+                              variable.active 
+                                ? 'bg-[#3f4d27] text-[#C9FF3B] flex flex-row items-center px-2 rounded-full' 
+                                : 'flex flex-row items-center px-2'
                             }`}
-                            onClick={() => handleVariableClick(variable)}
                           >
                             {variable.name}
                             {variable.active ? (
@@ -134,23 +126,6 @@ export function VariablesModal({ isOpen, onClose }: VariablesModalProps) {
                     </div>
                   ))}
                 </div>
-
-                {selectedVariable && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-[#222324] rounded-lg p-6 space-y-2 border border-[#525252] flex flex-row justify-between"
-                  >
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xl text-white">{selectedVariable}</h3>
-                      <Info className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <p className="text-gray-400">
-                      This variable controls the distribution of CO2 emissions across different zones
-                      and affects the overall environmental impact calculation of the charging network.
-                    </p>
-                  </motion.div>
-                )}
               </div>
             </div>
           </motion.div>
