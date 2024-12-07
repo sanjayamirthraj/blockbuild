@@ -1,50 +1,125 @@
-# React + TypeScript + Vite
+# Data Visualization Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern data visualization dashboard built with React, TypeScript, and Vite, featuring interactive charts, variable editing, and real-time data visualization.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Core Screens
+- **Dashboard Screen**
+  - Interactive data visualization component
+  - Variables Panel for parameter adjustments
+  - Edit Variables button with slide-over functionality
 
-## Expanding the ESLint configuration
+- **Variable Editing Screen**
+  - Slide-over card interface
+  - Real-time visualization updates
+  - Smooth transitions and focus states
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Details Screen**
+  - Data point hover interactions
+  - Contextual information display
+  - Fade-in animations
 
-- Configure the top-level `parserOptions` property like this:
+### Key Interactions
+- 🔄 Slide-Over Variable Editing
+- 💡 Data Point Hover Details
+- ✨ Variable Selection & Toggle
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Technical Features
+- 📱 Responsive Layout
+- 🔐 Firebase Authentication
+- 🎯 State Management (Redux/Zustand)
+- 🎨 Modern UI/UX with Smooth Transitions
+
+## 🛠️ Technical Stack
+
+- **Frontend:** React 18+ with TypeScript
+- **State Management:** Redux Toolkit/Zustand
+- **Routing:** React Router v6+
+- **Styling:** Tailwind CSS
+- **Authentication:** Firebase (Google OAuth + Email/Password)
+- **Build Tool:** Vite
+
+## 🏗️ Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/data-viz-platform.git
+   cd data-viz-platform
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+   Create a `.env` file:
+   ```env
+   VITE_FIREBASE_API_KEY=<Your_Firebase_API_Key>
+   VITE_FIREBASE_AUTH_DOMAIN=<Your_Firebase_Auth_Domain>
+   VITE_FIREBASE_PROJECT_ID=<Your_Firebase_Project_ID>
+   VITE_FIREBASE_STORAGE_BUCKET=<Your_Firebase_Storage_Bucket>
+   VITE_FIREBASE_MESSAGING_SENDER_ID=<Your_Firebase_Messaging_Sender_ID>
+   VITE_FIREBASE_APP_ID=<Your_Firebase_App_ID>
+   ```
+
+## 🚦 Running the Application
+
+**Development**
+```bash
+npm run dev
+# Open http://localhost:5173
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+**Production**
+```bash
+npm run build
+npm run preview
 ```
+
+## 📁 Project Structure
+
+```
+data-viz-platform/
+├─ src/
+│  ├─ components/    # UI components
+│  ├─ features/      # Feature logic
+│  ├─ hooks/         # Custom hooks
+│  ├─ pages/         # Page components
+│  ├─ state/         # State management
+│  ├─ styles/        # Global styles
+│  ├─ utils/         # Utilities
+│  ├─ App.tsx        # Root component
+│  └─ main.tsx       # Entry point
+├─ public/
+└─ [config files]
+```
+
+## 🤔 Technical Decisions & Trade-offs
+
+### Chosen Technologies
+- **State Management:** Redux Toolkit/Zustand for scalability
+- **Styling:** Utility-first CSS with Tailwind
+- **TypeScript:** Enhanced type safety and maintainability
+- **Firebase Auth:** Quick integration and scalability
+
+### Current Limitations
+- 📊 Uses mock data (needs real data integration)
+- ⚠️ Basic error handling (needs enhancement)
+- 🌐 Modern browser focus (needs broader support)
+
+## ⏱️ Development Timeline
+
+| Phase | Time |
+|-------|------|
+| Initial Setup | ~2 hours |
+| Design & Layout | ~4-6 hours |
+| State & Interactions | ~3-4 hours |
+| Styling & Animations | ~2-3 hours |
+| Review & Documentation | ~1-2 hours |
+
+## 📞 Contact
+
+- Design Questions: shaurya@answersai.ai
+- Technical Questions: siddhant@answersai.com
